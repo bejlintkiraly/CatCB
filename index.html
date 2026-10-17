@@ -1,0 +1,1640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CatCB — Personal IT Snippet Manager</title>
+<link rel="icon" href="/CatCB_Mascot_v14.png">
+<style>
+:root{
+ --bg:#070c14;--panel:rgba(11,18,30,.89);--panel2:rgba(17,27,43,.91);--panel3:rgba(29,43,62,.94);
+ --text:#f3f6fc;--muted:#93a2b8;--line:rgba(151,177,210,.17);--accent:#a9f475;--accent2:#c5ff9a;
+ --accentText:#14220d;--selected:rgba(139,220,100,.15);--selectedText:#f4ffe9;--editor:rgba(7,13,23,.76);
+ --blue:#80dcff;--danger:#ff8295;--wallpaper-opacity:.50;--shadow:0 18px 54px rgba(0,0,0,.23);--radius:17px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{min-width:760px;overflow:hidden;background:var(--bg);color:var(--text);font-family:"Segoe UI",Inter,system-ui,sans-serif;font-size:14px}
+body:before{content:"";position:fixed;inset:0;background:
+ linear-gradient(115deg,rgba(3,8,15,.68),rgba(4,10,18,.46) 48%,rgba(3,8,15,.73)),
+ url("/CatCB_Space_v14.jpg") center/cover no-repeat;
+ opacity:var(--wallpaper-opacity);z-index:-2;transition:opacity .28s ease}
+body.no-wallpaper:before{opacity:0}
+body.no-wallpaper{background:radial-gradient(ellipse at 14% 3%,#17283a 0,#0b1421 41%,#070c14 100%)}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;color:var(--text);border:1px solid var(--line);border-radius:10px;background:rgba(19,30,47,.88);padding:9px 12px;transition:background .16s,border-color .16s,transform .16s,box-shadow .16s}
+button:hover{background:rgba(37,54,76,.94);border-color:rgba(181,207,237,.30);transform:translateY(-1px)}
+button:active{transform:translateY(0) scale(.99)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.history-button{font-size:22px;min-width:42px}.history-button:disabled{opacity:.3;cursor:default;box-shadow:none}
+button:disabled{opacity:.38;cursor:not-allowed;transform:none}
+button.primary{background:linear-gradient(135deg,#bdff8d,#8be44d);color:#16220f;border-color:transparent;font-weight:750;box-shadow:0 6px 20px rgba(151,232,92,.12)}
+button.primary:hover{background:linear-gradient(135deg,#cbff9f,#a3ef6b);box-shadow:0 9px 25px rgba(151,232,92,.19)}
+button.ghost{background:transparent}
+button.tiny{font-size:12px;padding:6px 9px}
+input,textarea,select{width:100%;min-width:0;background:rgba(7,14,24,.72);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+input::placeholder,textarea::placeholder{color:#708199}
+textarea{resize:vertical;min-height:140px;line-height:1.5}
+label{user-select:none}
+.app{height:100dvh;min-height:600px;max-width:2000px;margin:auto;padding:18px 20px 13px;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:14px;isolation:isolate}
+.topbar{display:grid;grid-template-columns:minmax(260px,315px) minmax(200px,1fr) auto;gap:18px;align-items:center;min-height:64px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand img{width:48px;height:48px;flex:0 0 48px;border-radius:13px;object-fit:cover;border:1px solid rgba(255,255,255,.23);box-shadow:0 5px 22px #0004}
+.brand-title{display:flex;align-items:center;gap:9px;line-height:1}
+.brand h1{font-size:26px;letter-spacing:-.8px;margin:0;font-weight:800}
+.version{font-size:10px;color:#d7e1ee;border:1px solid var(--line);background:rgba(15,26,42,.78);padding:5px 8px;border-radius:8px}
+.brand .sub{margin-top:6px;color:#c0cada;font-size:12px}
+.searchwrap{position:relative}
+.searchwrap .searchicon{position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:.68;font-size:18px;pointer-events:none}
+.searchwrap input{height:46px;padding-left:42px;background:rgba(9,16,27,.74);backdrop-filter:blur(13px);border-color:rgba(157,181,211,.14)}
+.top-actions{display:flex;align-items:center;gap:7px}
+.top-actions button{height:42px;white-space:nowrap;font-size:12px}
+.icon-button{width:42px;min-width:42px;padding:0;display:grid;place-items:center;font-size:17px}
+.layout{display:grid;grid-template-columns:220px minmax(335px,.92fr) minmax(395px,1.17fr);gap:14px;min-height:0;overflow:hidden}
+.panel{background:var(--panel);backdrop-filter:blur(23px) saturate(1.25);-webkit-backdrop-filter:blur(23px) saturate(1.25);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);min-height:0;min-width:0}
+.sidebar{padding:13px 11px;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.side-label{padding:7px 10px 10px}
+.nav-list{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding-right:1px}
+.nav-list::-webkit-scrollbar,.snippet-list::-webkit-scrollbar,.detail::-webkit-scrollbar{width:6px}
+.nav-list::-webkit-scrollbar-thumb,.snippet-list::-webkit-scrollbar-thumb,.detail::-webkit-scrollbar-thumb{background:rgba(148,170,196,.22);border-radius:8px}
+.nav{display:flex;align-items:center;gap:10px;text-align:left;width:100%;border-color:transparent;background:transparent;padding:10px 10px;margin:2px 0;color:#dce5f2;font-size:12px;min-height:39px}
+.nav .navico{width:19px;flex:0 0 19px;font-size:15px;text-align:center;color:#b6c6da}
+.nav .navcount{margin-left:auto;font-size:10px;background:rgba(137,158,184,.12);padding:4px 7px;border-radius:8px;color:#cbd6e5;min-width:22px;text-align:center}
+.nav.active{background:linear-gradient(90deg,rgba(168,243,109,.16),rgba(168,243,109,.045));border-color:rgba(168,243,109,.14);color:var(--accent);position:relative}
+.nav.active:before{content:"";position:absolute;left:-1px;top:7px;bottom:7px;width:3px;background:var(--accent);border-radius:0 4px 4px 0}
+.nav.active .navico{color:var(--accent)}
+.nav-section{font-size:9px;letter-spacing:1.2px;color:var(--muted);font-weight:800;padding:16px 10px 6px}
+.add-category-link{width:100%;text-align:left;border:1px dashed var(--line);background:transparent;color:var(--muted);font-size:11px;padding:9px 10px;margin-top:6px}
+.sidebar-bottom{flex:0 0 auto;border-top:1px solid var(--line);padding-top:8px;margin-top:9px}
+.signature{border:1px solid var(--line);border-radius:12px;padding:10px 11px;margin-top:7px;background:rgba(17,29,45,.48);line-height:1.35;overflow:hidden}
+.signature strong{color:#d7ffb6;font-size:11px;white-space:nowrap;display:block}
+.signature small{display:block;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.4}
+.content-panel{display:flex;flex-direction:column;min-height:0;padding:13px 12px;overflow:hidden}
+.sectionbar{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:10px;flex:0 0 auto}
+.sectionbar h2{font-size:10px;letter-spacing:1px;margin:0 0 0 3px;color:#d0dcec;white-space:nowrap}
+.section-actions{display:flex;gap:5px}
+.section-actions button{font-size:11px;padding:8px 9px;white-space:nowrap}
+.snippet-list{overflow:auto;min-height:0;flex:1;padding-right:2px;overscroll-behavior:contain}
+.multi-toolbar{display:none;align-items:center;justify-content:space-between;gap:8px;padding:7px 8px;margin:0 0 7px;border:1px solid rgba(168,243,109,.16);border-radius:10px;background:rgba(168,243,109,.055);font-size:10px;color:var(--muted);flex:0 0 auto}
+.multi-toolbar.visible{display:flex;animation:rise .15s ease}
+.multi-toolbar .multi-status{color:var(--accent);font-weight:800;white-space:nowrap}
+.multi-toolbar .multi-actions{display:flex;gap:5px;align-items:center}
+.multi-toolbar button{font-size:10px;padding:5px 7px}
+.snippet-row{grid-template-columns:16px 29px minmax(0,1fr) 22px}
+.snippet-select{width:14px;height:14px;padding:0;margin:0;accent-color:var(--accent);cursor:pointer;flex:0 0 14px}
+.snippet-row.cut-mark{opacity:.53;border-style:dashed;border-color:rgba(168,243,109,.34)}
+.snippet-row.cut-mark .s-title:after{content:' · CUT';font-size:9px;color:var(--accent);font-weight:850;letter-spacing:.4px}
+.snippet-row .snip-main{cursor:pointer}
+
+.snippet-row{display:grid;grid-template-columns:16px 29px minmax(0,1fr) 22px;align-items:center;gap:8px;padding:10px 7px;margin:3px 0;border:1px solid transparent;border-radius:12px;cursor:pointer;transition:background .16s,border-color .16s,transform .16s;animation:rise .2s ease both}
+.snippet-row:hover{background:rgba(156,183,213,.065);transform:translateX(1px)}
+.snippet-row.selected{background:var(--selected);border-color:rgba(168,243,109,.18);box-shadow:inset 2px 0 var(--accent)}
+.snippet-row.selected .s-title{color:#f4ffe9}
+.snip-icon{width:29px;height:29px;border-radius:9px;display:grid;place-items:center;background:rgba(116,217,255,.1);color:var(--blue);font-size:14px}
+.snippet-row:nth-child(4n+2) .snip-icon{background:rgba(255,197,91,.1);color:#ffd067}
+.snippet-row:nth-child(4n+3) .snip-icon{background:rgba(181,120,255,.1);color:#c7a0ff}
+.snippet-row:nth-child(4n+4) .snip-icon{background:rgba(168,243,109,.1);color:var(--accent)}
+.snip-main{min-width:0}
+.s-title{font-size:11px;font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#ecf2fb}
+.s-sub{font-size:10px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-category{margin-top:5px;font-size:9px;color:#96dfff}
+.star{border:0;background:transparent;padding:2px 0;color:#8192a9;font-size:16px;box-shadow:none;min-width:22px}
+.star:hover{transform:scale(1.12);background:transparent}
+.star.on{color:#ffd44f}
+.detail{display:flex;flex-direction:column;padding:17px;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.detail-top{display:flex;align-items:flex-start;gap:11px;margin-bottom:14px;flex:0 0 auto}
+.detail-glyph{width:47px;height:47px;flex:0 0 47px;border-radius:13px;background:rgba(116,217,255,.09);color:var(--blue);display:grid;place-items:center;font-size:23px;border:1px solid rgba(116,217,255,.13)}
+.detail-titlebox{min-width:0;flex:1}
+.detail-title-line h2{font-size:17px;letter-spacing:-.3px;margin:2px 0 8px;overflow-wrap:anywhere;line-height:1.25}
+.detail-sub{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:var(--muted);font-size:11px}
+.pill{font-size:10px;padding:5px 8px;border:1px solid rgba(116,217,255,.18);background:rgba(116,217,255,.08);color:#a6e7ff;border-radius:8px;white-space:nowrap}
+.detail-tools{display:flex;gap:2px}
+.detail-tools button{padding:4px 6px;border:0;background:transparent;min-width:28px}
+.label-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:2px 0 7px;flex:0 0 auto}
+.label-row label{font-size:10px;font-weight:800;letter-spacing:1px;color:var(--muted)}
+.label-row .sidehint{font-size:10px;color:var(--muted);text-align:right}
+.previewbox{position:relative;border:1px solid var(--line);border-radius:11px;background:var(--editor);padding:13px;min-height:95px;margin-bottom:14px;flex:0 0 auto}
+.previewbox pre{font:11px/1.65 "Cascadia Code",Consolas,monospace;color:#f0f5fe;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;padding-right:29px;min-height:54px}
+.copy-corner{position:absolute;right:7px;top:7px;width:28px;height:28px;min-width:28px;padding:0;background:rgba(32,46,64,.72)}
+.variables{margin-bottom:12px;flex:0 0 auto}
+.vars-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.var-field label,.custom-field label{display:block;font-size:10px;color:#bac8d9;margin-bottom:5px}
+.var-field input{height:35px;padding:7px 8px;font-size:11px}
+.custom-field{margin-top:9px}
+.custom-field input{height:35px;font-size:11px}
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;flex:0 0 auto}
+.action-row button{font-size:11px;padding:11px 8px}
+.action-row .primary{font-size:11px}
+.preview-bottom{border-top:1px solid var(--line);padding-top:11px;flex:0 0 auto}
+.email-fields{display:none;border:1px solid rgba(116,217,255,.18);background:rgba(10,22,34,.52);border-radius:12px;padding:11px;margin-bottom:12px;flex:0 0 auto}
+.email-fields.visible{display:block;animation:rise .18s ease}
+.email-fields .email-title{font-size:10px;letter-spacing:1px;font-weight:800;color:var(--blue);margin-bottom:8px}
+.email-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.email-meta-grid .wide{grid-column:1/-1}
+.email-meta-grid label{display:block;font-size:10px;color:var(--muted);margin-bottom:5px}
+.email-meta-grid input{height:33px;padding:7px 9px;font-size:11px}
+.email-actions{display:none;grid-template-columns:1fr 1fr;gap:7px;margin:-3px 0 13px;flex:0 0 auto}
+.email-actions.visible{display:grid;animation:rise .18s ease}
+.email-actions button{font-size:11px;padding:10px 7px}
+
+
+.preview-bottom .label-row{margin-bottom:7px}
+.preview-bottom .previewbox{min-height:78px;margin-bottom:0}
+.preview-bottom .previewbox pre{min-height:52px}
+.footer{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:9px;padding:0 4px;min-height:15px;line-height:1.2;white-space:nowrap}
+.footer .status{color:var(--accent);font-weight:800;letter-spacing:.5px}
+.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(1,4,9,.68);backdrop-filter:blur(10px);z-index:20}
+.modal-backdrop.open{display:flex;animation:fade .16s ease}
+.modal{width:min(720px,96vw);max-height:90vh;overflow:auto;background:rgba(12,21,34,.98);border:1px solid var(--line);box-shadow:0 25px 100px #0009;border-radius:19px;padding:23px;animation:pop .18s ease}
+.modal h2{margin:0;font-size:21px;letter-spacing:-.4px}
+.modal p{margin:6px 0 18px;color:var(--muted);font-size:12px;line-height:1.5}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-field.full{grid-column:1/-1}
+.form-field label{display:block;font-size:10px;font-weight:800;letter-spacing:.7px;color:var(--muted);margin-bottom:6px}
+.form-field textarea{min-height:170px;font-family:"Cascadia Code",Consolas,monospace;font-size:12px}
+.modal-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:15px}
+.modal-actions .right{display:flex;gap:7px}
+.checkline{display:flex;gap:8px;align-items:center;color:#c8d6e6;font-size:12px;letter-spacing:0!important;font-weight:500!important}
+.checkline input{width:auto}
+.settings-tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:15px;padding-bottom:11px;flex-wrap:wrap}
+.settings-tabs button{font-size:11px;padding:8px 10px}
+.settings-tabs button.active{background:var(--selected);border-color:rgba(168,243,109,.26);color:var(--accent)}
+.settings-section{display:none}.settings-section.active{display:block;animation:rise .16s ease}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 0;border-bottom:1px solid var(--line)}
+.setting-row:last-child{border-bottom:0}
+.setting-row h3{font-size:12px;margin:0 0 4px}.setting-row p{font-size:11px;margin:0;color:var(--muted);max-width:420px}
+.setting-control{min-width:130px;display:flex;justify-content:flex-end;align-items:center;gap:8px}
+.setting-control input[type=range]{max-width:155px;padding:0;accent-color:var(--accent);border:0;background:transparent}
+.setting-control select{max-width:190px;font-size:11px;padding:8px}
+.sidebar-tool{flex:0 0 auto;border-top:1px solid var(--line);margin-top:6px;padding-top:7px}
+.email-actions .save-email-details{grid-column:1/-1;background:transparent;border-style:dashed;font-size:10px;padding:8px}
+.modal.report-studio{width:min(980px,97vw)}
+.studio-layout{display:grid;grid-template-columns:minmax(270px,.85fr) minmax(340px,1.15fr);gap:15px}
+.studio-card{border:1px solid var(--line);border-radius:13px;background:rgba(20,32,48,.46);padding:14px;min-width:0}
+.studio-card h3{font-size:11px;letter-spacing:.8px;color:var(--blue);margin:0 0 12px}
+.studio-field{margin-bottom:11px}
+.studio-field:last-child{margin-bottom:0}
+.studio-field label{display:block;font-size:10px;font-weight:750;letter-spacing:.45px;color:var(--muted);margin-bottom:5px}
+.studio-field input,.studio-field select{height:36px;padding:7px 9px;font-size:11px}
+.studio-field textarea{min-height:240px;font-size:12px;line-height:1.6}
+.attachment-box{border:1px dashed var(--line);border-radius:11px;padding:11px;margin-top:10px}
+.attachment-box input[type=file]{height:auto;padding:8px;border:0;background:transparent;font-size:11px}
+.attachment-list{font-size:10px;color:var(--muted);line-height:1.6;margin-top:6px;overflow-wrap:anywhere}
+.studio-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.studio-badges span{font-size:9px;color:var(--muted);border:1px solid var(--line);border-radius:20px;padding:5px 8px}
+.config-path{display:block;padding:9px 10px;background:rgba(5,12,20,.6);border:1px solid var(--line);border-radius:9px;color:var(--blue);font:11px/1.5 "Cascadia Code",Consolas,monospace;word-break:break-all;user-select:text}
+
+
+@media(max-width:1160px){.studio-layout{grid-template-columns:1fr}.studio-field textarea{min-height:130px}.modal.report-studio{max-height:94vh}}
+
+.category-manage{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:7px;align-items:center;margin:8px 0}
+.category-manage .cat-label{border:1px solid var(--line);background:rgba(22,34,51,.7);border-radius:9px;padding:9px 11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.data-actions{display:flex;gap:8px;flex-wrap:wrap}
+.danger-text{color:var(--danger)!important}
+.toast{position:fixed;bottom:25px;left:50%;transform:translate(-50%,15px);opacity:0;pointer-events:none;padding:11px 16px;border:1px solid rgba(168,243,109,.27);background:rgba(13,25,35,.97);color:#dfffca;border-radius:11px;box-shadow:0 12px 35px #0007;z-index:50;transition:all .2s;font-size:12px}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+.app-dialog-backdrop{position:fixed;inset:0;z-index:1100;display:none;align-items:center;justify-content:center;padding:22px;
+ background:rgba(2,6,12,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.app-dialog-backdrop.open{display:flex;animation:fade .14s ease}
+.app-dialog{width:min(460px,94vw);background:linear-gradient(160deg,rgba(18,29,45,.99),rgba(9,16,27,.99));
+ border:1px solid rgba(155,183,216,.24);border-radius:20px;padding:22px;box-shadow:0 28px 95px rgba(0,0,0,.64);
+ animation:pop .17s ease}
+.app-dialog-head{display:grid;grid-template-columns:43px minmax(0,1fr) 28px;gap:12px;align-items:start;margin-bottom:16px}
+.app-dialog-mark{width:43px;height:43px;display:grid;place-items:center;border-radius:13px;background:rgba(168,243,109,.11);
+ border:1px solid rgba(168,243,109,.19);color:var(--accent);font-size:20px}
+.app-dialog-title{font-size:17px;letter-spacing:-.25px;margin:2px 0 7px;color:var(--text);font-weight:800}
+.app-dialog-message{font-size:12px;line-height:1.65;color:var(--muted);margin:0;overflow-wrap:anywhere;white-space:normal}
+.app-dialog-close{border:0;background:transparent;padding:3px;min-width:28px;font-size:18px;color:var(--muted)}
+.app-dialog-field{margin:16px 0 4px}
+.app-dialog-field label{display:block;font-size:10px;letter-spacing:1px;font-weight:800;color:var(--muted);margin-bottom:7px}
+.app-dialog-field input,.app-dialog-field textarea{background:rgba(4,10,18,.78);border-color:rgba(157,181,211,.22);font-size:13px;padding:11px 12px}
+.app-dialog-field input:focus,.app-dialog-field textarea:focus{border-color:rgba(169,244,117,.6);box-shadow:0 0 0 3px rgba(169,244,117,.08);outline:0}
+.app-dialog-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:21px}
+.app-dialog-actions button{min-width:92px;padding:10px 14px;font-size:12px;font-weight:650}
+.app-dialog-actions button.danger{background:rgba(255,130,149,.12);border-color:rgba(255,130,149,.29);color:#ff9aaa}
+.app-dialog-actions button.danger:hover{background:rgba(255,130,149,.2)}
+.app-dialog-hint{font-size:10px;color:var(--muted);margin-top:13px;padding-top:10px;border-top:1px solid var(--line)}
+
+.context-menu{position:fixed;z-index:1000;display:none;min-width:220px;max-width:290px;padding:6px;
+ background:rgba(12,20,33,.98);border:1px solid rgba(157,181,211,.25);border-radius:13px;
+ box-shadow:0 18px 55px rgba(0,0,0,.48);backdrop-filter:blur(22px);animation:pop .12s ease}
+.context-menu.open{display:block}
+.context-menu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;
+ padding:10px 11px;border-radius:8px;font-size:12px;color:var(--text);transform:none}
+.context-menu button:hover{background:rgba(168,243,109,.12);color:var(--accent)}
+.context-menu button.danger{color:var(--danger)}
+.context-menu button.danger:hover{background:rgba(255,120,141,.11)}
+.context-menu .cm-divider{height:1px;background:var(--line);margin:5px 4px}
+.context-menu .cm-heading{padding:7px 10px 5px;font-size:9px;letter-spacing:1px;color:var(--muted);font-weight:800}
+.category-manage .category-icon-edit{min-width:35px;padding:6px 8px;font-size:15px}
+
+.update-hero{display:flex;align-items:flex-start;gap:13px;padding:15px;border:1px solid rgba(168,243,109,.2);background:linear-gradient(120deg,rgba(168,243,109,.1),rgba(19,32,49,.4));border-radius:14px;margin-bottom:13px}
+.update-hero-icon{width:45px;height:45px;flex:0 0 45px;display:grid;place-items:center;border-radius:13px;background:rgba(168,243,109,.12);color:var(--accent);font-size:22px}
+.update-hero h3{font-size:15px;margin:0 0 6px}.update-hero p{font-size:11px;line-height:1.55;color:var(--muted);margin:0}
+.update-card{border:1px solid var(--line);background:rgba(10,18,30,.5);border-radius:13px;padding:14px;margin-bottom:11px}
+.update-card h3{font-size:11px;letter-spacing:.9px;color:var(--blue);margin:0 0 10px}
+.update-version-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid rgba(151,177,210,.1)}
+.update-version-row:last-child{border-bottom:0}
+.update-file-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.update-file-name{min-width:0;flex:1;font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.update-file-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.update-meta-cell{min-width:0;background:rgba(5,12,20,.45);border:1px solid var(--line);border-radius:10px;padding:10px}
+.update-meta-cell label{display:block;font-size:9px;letter-spacing:.7px;color:var(--muted);font-weight:800;margin-bottom:5px}
+.update-meta-cell strong{display:block;font-size:11px;color:var(--text);overflow-wrap:anywhere}
+.update-notes{font-size:11px;line-height:1.6;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere;margin-top:9px}
+.update-status{display:flex;align-items:flex-start;gap:9px;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(18,30,45,.55);font-size:11px;line-height:1.5;color:var(--muted);margin-top:10px}
+.update-status.good{border-color:rgba(168,243,109,.25);color:#d9ffbf;background:rgba(93,160,58,.08)}
+.update-status.bad{border-color:rgba(255,130,149,.25);color:#ffc1ca;background:rgba(255,80,105,.07)}
+.update-status .status-symbol{font-size:15px}
+.update-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:12px}
+.update-actions button{font-size:11px}
+.update-note{font-size:10px;line-height:1.6;color:var(--muted);margin-top:10px}
+.update-progress{display:none;height:4px;background:rgba(143,166,190,.14);border-radius:9px;overflow:hidden;margin-top:10px}
+.update-progress.active{display:block}.update-progress span{display:block;height:100%;width:36%;background:var(--accent);border-radius:9px;animation:updateProgress 1s ease-in-out infinite alternate}
+@keyframes updateProgress{from{transform:translateX(-30%)}to{transform:translateX(220%)}}
+
+.about-hero{display:flex;align-items:center;gap:13px;padding:14px;border:1px solid rgba(168,243,109,.2);
+ background:linear-gradient(125deg,rgba(168,243,109,.1),rgba(20,34,52,.36));border-radius:14px;margin-bottom:13px}
+.about-hero img{width:55px;height:55px;flex:0 0 55px;object-fit:cover;border-radius:15px;border:1px solid rgba(255,255,255,.2)}
+.about-hero h3{margin:0 0 5px;font-size:17px;letter-spacing:-.3px}
+.about-hero p{margin:0;color:var(--muted);font-size:11px;line-height:1.55}
+.about-kicker{font-size:9px;letter-spacing:1.2px;color:var(--accent);font-weight:850;margin-bottom:7px}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.about-card{min-width:0;border:1px solid var(--line);background:rgba(20,32,48,.44);border-radius:13px;padding:13px}
+.about-card h3{margin:0 0 7px;font-size:12px;color:var(--text)}
+.about-card p{font-size:11px;color:var(--muted);line-height:1.6;margin:0}
+.about-card ul{list-style:none;padding:0;margin:0;display:grid;gap:9px}
+.about-card li{font-size:11px;line-height:1.55;color:var(--muted);display:grid;grid-template-columns:22px 1fr;gap:7px}
+.about-card li b{color:var(--text);font-weight:750}
+.about-card .step{display:grid;place-items:center;width:21px;height:21px;border-radius:7px;background:rgba(168,243,109,.12);color:var(--accent);font-size:10px;font-weight:850}
+.about-history{border:1px solid var(--line);background:rgba(10,18,30,.55);border-radius:13px;padding:13px;margin-bottom:12px}
+.about-history-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.about-history-head h3{font-size:12px;margin:0}
+.about-history-list{display:grid;gap:7px}
+.history-entry{display:grid;grid-template-columns:56px 1fr;gap:10px;padding:9px 0;border-top:1px solid rgba(151,177,210,.1)}
+.history-entry:first-child{border-top:0}
+.history-version{color:var(--accent);font-size:10px;font-weight:850;padding-top:2px}
+.history-entry h4{font-size:11px;margin:0 0 3px;color:var(--text)}
+.history-entry p{font-size:10px;line-height:1.5;color:var(--muted);margin:0}
+.about-support{display:flex;align-items:center;gap:12px;border:1px solid rgba(255,193,91,.2);
+ background:linear-gradient(115deg,rgba(255,193,91,.08),rgba(17,28,42,.45));border-radius:13px;padding:13px;margin-bottom:12px}
+.about-support-icon{width:40px;height:40px;flex:0 0 40px;display:grid;place-items:center;border-radius:12px;background:rgba(255,193,91,.1);font-size:19px}
+.about-support h3{font-size:12px;margin:0 0 5px}
+.about-support p{font-size:11px;color:var(--muted);line-height:1.55;margin:0}
+.about-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px;padding-top:3px}
+.about-local-pill{border:1px solid var(--line);padding:5px 8px;border-radius:20px;white-space:nowrap}
+@media(max-width:720px){.about-grid{grid-template-columns:1fr}.about-hero{align-items:flex-start}}
+
+.category-manage .cat-label{display:flex;align-items:center;gap:9px}
+.category-manage .cat-emoji{display:inline-grid;place-items:center;min-width:24px;width:24px;height:24px;border-radius:7px;background:rgba(116,217,255,.09)}
+.context-hint{font-size:10px;color:var(--muted);padding:8px 10px 3px}
+
+
+
+
+
+
+
+
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(7px) scale(.992)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1250px){
+ .app{padding:8px;gap:8px}.layout{grid-template-columns:minmax(145px,.55fr) minmax(210px,.95fr) minmax(255px,1.15fr);gap:8px}
+ .topbar{grid-template-columns:minmax(175px,220px) minmax(130px,1fr) auto;gap:8px}
+ .top-actions{gap:5px}.top-actions button{padding:8px 9px}.top-actions .icon-button{min-width:36px;width:36px}
+ .detail{padding:11px}.sidebar{padding:8px 7px}.content-panel{padding:10px 8px}
+ .section-actions button{padding:7px 8px}.snippet-row{grid-template-columns:16px 26px minmax(0,1fr) 20px;gap:6px;padding:9px 6px}
+ .snip-icon{width:26px;height:26px}.s-category{display:block;font-size:9px}.detail-title-line h2{font-size:15px}
+ .brand h1{font-size:23px}.brand img{width:42px;height:42px;flex-basis:42px}
+}
+@media(max-width:900px){
+ .layout{grid-template-columns:minmax(130px,.52fr) minmax(190px,.9fr) minmax(230px,1.1fr);gap:7px}
+ .topbar{grid-template-columns:minmax(155px,185px) minmax(100px,1fr) auto;gap:6px}
+ .brand .sub{font-size:10px}.brand h1{font-size:20px}.brand img{width:36px;height:36px;flex-basis:36px}
+ .top-actions button{font-size:10px;padding:7px}.top-actions .icon-button{width:32px;min-width:32px}
+ .multi-toolbar{align-items:flex-start}.multi-toolbar .multi-actions button{font-size:10px;padding:6px 7px}
+ .detail .vars-grid{grid-template-columns:1fr 1fr}.detail .vars-grid .var-field:last-child{grid-column:1/-1}
+}
+
+@media(max-height:740px){
+ .app{padding-top:10px;padding-bottom:8px;gap:9px}.topbar{min-height:53px}.brand img{width:40px;height:40px;flex-basis:40px}
+ .brand h1{font-size:23px}.layout{gap:10px}.sidebar{padding-top:8px;padding-bottom:8px}.nav{padding:7px 9px;min-height:32px}
+ .side-label{padding-bottom:5px}.nav-section{padding-top:10px}.signature{padding:7px 9px}.detail{padding:12px}
+ .previewbox{padding:10px;min-height:78px;margin-bottom:10px}.vars-grid{gap:6px}.var-field input,.custom-field input{height:31px}
+ .action-row button{padding:9px 6px}.footer{font-size:8px}
+}
+
+/* v1.10.2 layout hotfix: multi-select rows have four direct children:
+   checkbox, icon, text block, favorite star. Keep recycle-bin rows untouched. */
+#snippetList .snippet-row[data-id]{
+ display:grid;
+ grid-template-columns:16px 29px minmax(0,1fr) 22px !important;
+ align-items:center;
+ gap:8px;
+ width:100%;
+ min-width:0;
+ max-width:100%;
+}
+@media(max-width:1250px){#snippetList .snippet-row[data-id]{grid-template-columns:16px 26px minmax(0,1fr) 20px !important;gap:6px}}
+@media(max-width:900px){#snippetList .snippet-row[data-id]{gap:5px;padding-left:5px;padding-right:5px}}
+.app,.layout,.panel,.content-panel,.snippet-list{min-width:0}
+.snippet-row .s-title,.snippet-row .s-sub{max-width:100%}
+#snippetList .snippet-row[data-id] > .snippet-select{grid-column:1;justify-self:center}
+#snippetList .snippet-row[data-id] > .snip-icon{grid-column:2;justify-self:center}
+#snippetList .snippet-row[data-id] > .snip-main{grid-column:3;min-width:0;width:100%;overflow:hidden}
+#snippetList .snippet-row[data-id] > .star{grid-column:4;justify-self:end;min-width:22px}
+.multi-toolbar{min-width:0}
+.multi-toolbar .multi-status{flex:1 1 auto;min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.4}
+.multi-toolbar .multi-actions{flex:0 0 auto}
+.snippet-list{overflow-x:hidden;min-width:0}
+
+</style>
+</head>
+<body>
+<div class="app">
+ <header class="topbar">
+  <div class="brand"><img src="/CatCB_Mascot_v14.png" alt="CatCB mascot"><div>
+   <div class="brand-title"><h1>CatCB</h1><span class="version" data-app-version>v1.10.2</span></div><div class="sub">Your personal IT snippet manager</div></div>
+  </div>
+  <div class="searchwrap"><span class="searchicon">⌕</span><input id="search" placeholder="Search snippets…  (Ctrl + F)" autocomplete="off"></div>
+  <div class="top-actions">
+   <button id="wallpaperBtn" title="Toggle space wallpaper">◉ <span id="wallpaperText">Background on</span></button>
+   <button id="undoBtn" class="icon-button history-button" title="Undo (Ctrl+Z)" aria-label="Undo" disabled>↶</button>
+   <button id="redoBtn" class="icon-button history-button" title="Redo (Ctrl+Y)" aria-label="Redo" disabled>↷</button>
+  </div>
+ </header>
+ <main class="layout">
+  <aside class="panel sidebar">
+   <div class="side-label eyebrow">WORKSPACE</div>
+   <nav class="nav-list" id="nav"></nav>
+   <div class="sidebar-tool"><button class="nav" id="reportStudioNav"><span class="navico">✉</span><span>Report Email Studio</span></button></div>
+   <div class="sidebar-bottom">
+    <button class="nav" id="settingsNav"><span class="navico">⚙</span><span>Settings</span></button>
+    <div class="signature"><strong>♛ Made by Bejlint 💚</strong><small>CatCB™ · your IT sidekick 🐱</small></div>
+   </div>
+  </aside>
+  <section class="panel content-panel">
+   <div class="sectionbar"><h2>YOUR SNIPPETS</h2><div class="section-actions">
+    <button id="addBtn" class="primary">＋ Add</button><button id="editBtn">↗ Edit</button><button id="deleteBtn">⌫</button></div></div>
+   <div id="multiToolbar" class="multi-toolbar"><span id="multiSelectionCount" class="multi-status">0 selected</span><span class="multi-actions"><button id="selectAllVisibleBtn">Select visible</button><button id="clearSelectionBtn">Clear</button></span></div>
+   <div id="snippetList" class="snippet-list"></div>
+  </section>
+  <section class="panel detail" id="detail">
+   <div class="detail-top"><div class="detail-glyph" id="detailGlyph">☏</div>
+    <div class="detail-titlebox"><div class="detail-title-line"><h2 id="detailTitle">Investigation update</h2></div>
+     <div class="detail-sub">Category: <span class="pill" id="detailCategory">Incident Updates</span></div></div>
+    <div class="detail-tools"><button id="favoriteBtn" title="Toggle favorite">★</button><button id="moreBtn" title="More actions">•••</button></div>
+   </div>
+   <div class="email-fields" id="emailFields">
+    <div class="email-title">✉ OUTLOOK EMAIL TEMPLATE</div>
+    <div class="email-meta-grid">
+     <div class="wide"><label for="emailTo">To</label><input id="emailTo" list="outlookAccounts" placeholder="recipient@company.com; another@company.com"></div>
+     <datalist id="outlookAccounts"></datalist>
+     <div><label for="emailCc">CC</label><input id="emailCc" list="outlookAccounts" placeholder="Optional"></div>
+     <div><label for="emailBcc">BCC</label><input id="emailBcc" list="outlookAccounts" placeholder="Optional"></div>
+     <div class="wide"><label for="emailFrom">From / shared mailbox</label><input id="emailFrom" list="outlookAccounts" placeholder="Default Outlook account or shared mailbox"></div>
+     <div class="wide"><label for="emailSubject">Subject</label><input id="emailSubject" placeholder="e.g. Long running network incident report"></div>
+    </div>
+   </div>
+   <div class="label-row"><label>SNIPPET TEXT</label><span class="sidehint">Edit in modal</span></div>
+   <div class="previewbox"><pre id="templateText"></pre><button class="copy-corner" id="copyRawBtn" title="Copy original template">▢</button></div>
+   <div class="variables"><div class="label-row"><label>⛭ VARIABLES</label><span class="sidehint">Fill before copying · optional</span></div>
+    <div class="vars-grid">
+     <div class="var-field"><label for="varINC">INC number</label><input id="varINC" placeholder="e.g. INC1234567"></div>
+     <div class="var-field"><label for="varTEAM">Team</label><input id="varTEAM" placeholder="e.g. Network L2"></div>
+     <div class="var-field"><label for="varHOSTNAME">Hostname</label><input id="varHOSTNAME" placeholder="e.g. server01"></div>
+    </div><div class="custom-field"><label for="varPORT">Port (optional)</label><input id="varPORT" placeholder="e.g. 443"></div>
+   </div>
+   <div class="action-row"><button class="primary" id="copyBtn">▢ &nbsp; Copy filled text</button><button id="insertBtn">✧ &nbsp; Fill missing &amp; copy</button></div>
+   <div class="email-actions" id="emailActions">
+    <button class="primary" id="outlookDraftBtn">✉ &nbsp; Open Outlook draft</button>
+    <button id="msgDraftBtn">▣ &nbsp; Save .msg + open</button>
+    <button class="save-email-details" id="saveEmailDetailsBtn">Save To / CC / BCC / From / Subject into this template</button>
+   </div>
+   <div class="preview-bottom"><div class="label-row"><label>◉ PREVIEW</label><button class="tiny ghost" id="clearVarsBtn">Clear variables</button></div>
+    <div class="previewbox"><pre id="filledPreview"></pre><button class="copy-corner" id="copyPreviewBtn" title="Copy preview">▢</button></div></div>
+  </section>
+ </main>
+ <footer class="footer"><span class="status" id="status">● READY</span><span>Local-first · No account required · <b>Made by Bejlint ♥</b></span><span>Ctrl+N New · Ctrl+E Edit · Ctrl+D Favorite · Esc Clear search</span></footer>
+</div>
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+<div class="context-menu" id="contextMenu" role="menu"></div>
+<div class="app-dialog-backdrop" id="appDialogBackdrop"><div class="app-dialog" id="appDialogModal" role="dialog" aria-modal="true" aria-labelledby="appDialogTitle"></div></div>
+<script>
+const defaults=[
+ {title:"Incident update",category:"Incident Updates",favorite:true,icon:"☏",starter:true,content:"We are currently investigating incident {{INC}}. We will provide an update as soon as more information is available."},
+ {title:"DNS lookup (Windows)",category:"Commands",favorite:false,icon:"⌘",starter:true,content:"nslookup {{HOSTNAME}}"},
+ {title:"Shift handover",category:"Shift Handover",favorite:false,icon:"⇄",starter:true,content:"Incident: {{INC}}\nCurrent status:\n- \n\nNext steps:\n- "}
+];
+// Exact signatures for untouched v1.1 starter samples. Those are moved to Recycle Bin once on upgrade.
+const legacy={
+ "Awaiting another team":"We are awaiting an update from {{TEAM}} regarding incident {{INC}}. We will continue the investigation once further information is available.",
+ "No issue currently observed":"At this time, no issue is observed on {{HOSTNAME}}. We will continue monitoring and share an update if the situation changes.",
+ "Request for an update":"Could you please provide an update on the current status and next steps for incident {{INC}}?",
+ "Please complete the scorecard":"Please complete the mandatory scorecard and attach a screenshot as proof of completion.",
+ "Handover - next steps":"Incident: {{INC}}\nCurrent status:\n- \n\nActions completed:\n- \n\nNext steps:\n- \n\nPending with: {{TEAM}}",
+ "Check TCP port (PowerShell)":"Test-NetConnection {{HOSTNAME}} -Port {{PORT}}",
+ "Ask for logs":"Could you please share the relevant logs for {{HOSTNAME}} and the approximate time when the issue occurred? This will help us continue the investigation.",
+ "Resolution confirmation":"The issue appears to be resolved following the latest checks for incident {{INC}}. Could you please confirm whether the service is working as expected from your side?",
+ "Custom template example":"Incident {{INC}} has been reviewed by {{TEAM}}. Current system: {{HOSTNAME}}.",
+ "Team notification":"Dear team, please be informed that incident {{INC}} is currently under investigation. Further updates will follow."
+};
+const UI_APP_VERSION="1.10.2";
+let verifiedUpdate=null;
+let updateSelectedFile=null;
+let state={snippets:[],deleted:[],categories:[],categoryIcons:{},theme:"dark",wallpaper:true,wallpaperOpacity:50,alwaysTop:false,filter:"all",category:"All categories",selectedId:null,migration:{}};
+let selectedSnippetIds=new Set();
+let lastClickedSnippetId=null;
+let snippetClipboard={mode:null,items:[]};
+let toastTimer,saveTimer;
+const editHistory=[];
+let historyIndex=-1,historyRestore=false,historyTimer=null;
+function isTextEditable(el){
+ return !!el && (el.tagName==="INPUT"||el.tagName==="TEXTAREA"||el.isContentEditable) &&
+   !["checkbox","radio","file","range","button","submit"].includes((el.type||"").toLowerCase());
+}
+function captureEditState(el){
+ if(!isTextEditable(el))return;
+ const snap={id:el.id||"",tag:el.tagName,value:el.value??el.textContent??"",start:el.selectionStart??null,end:el.selectionEnd??null};
+ if(historyRestore)return;
+ const prev=editHistory[historyIndex];
+ if(prev&&prev.id===snap.id&&prev.value===snap.value)return;
+ editHistory.splice(historyIndex+1);
+ editHistory.push(snap);
+ if(editHistory.length>250)editHistory.shift();
+ historyIndex=editHistory.length-1;
+ updateHistoryButtons();
+}
+function updateHistoryButtons(){
+ const u=$("undoBtn"),r=$("redoBtn");
+ if(u)u.disabled=historyIndex<=0;
+ if(r)r.disabled=historyIndex<0||historyIndex>=editHistory.length-1;
+}
+function restoreEditState(index){
+ if(index<0||index>=editHistory.length)return;
+ const snap=editHistory[index],el=document.getElementById(snap.id);
+ if(!el)return;
+ historyRestore=true;
+ try{
+  if("value" in el)el.value=snap.value;else el.textContent=snap.value;
+  el.focus();
+  if(snap.start!==null&&typeof el.setSelectionRange==="function")el.setSelectionRange(snap.start,snap.end);
+  el.dispatchEvent(new Event("input",{bubbles:true}));
+  historyIndex=index;
+ }finally{historyRestore=false;updateHistoryButtons()}
+}
+function undoEdit(){if(historyIndex>0)restoreEditState(historyIndex-1)}
+function redoEdit(){if(historyIndex<editHistory.length-1)restoreEditState(historyIndex+1)}
+
+const $=id=>document.getElementById(id);
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
+function api(path,options){return fetch(path,options).then(r=>{if(!r.ok)throw Error("Local storage could not be reached");return r.json()})}
+async function init(){
+ try{
+  const saved=await api("/api/state");
+  state.theme="dark";state.wallpaper=saved.wallpaper!==false;
+  state.wallpaperOpacity=Number(saved.wallpaperOpacity??50);state.alwaysTop=!!saved.alwaysTop;
+  state.deleted=Array.isArray(saved.deleted)?saved.deleted:[];
+  state.categories=Array.isArray(saved.categories)?saved.categories:[];
+  state.categoryIcons=(saved.categoryIcons&&typeof saved.categoryIcons==="object")?saved.categoryIcons:{};
+  state.migration=saved.migration||{};
+  if(Array.isArray(saved.snippets)&&saved.snippets.length){
+   state.snippets=saved.snippets.map(s=>({...s,id:s.id||uid(),category:s.category||"Other",favorite:!!s.favorite,icon:s.icon||"☏"}));
+   migrateLegacyDefaults();
+  }else if(Array.isArray(saved.snippets)){
+   state.snippets=defaults.map(x=>({...x,id:uid()}));
+  }else{state.snippets=defaults.map(x=>({...x,id:uid()}));}
+ }catch(e){
+  state.snippets=defaults.map(x=>({...x,id:uid()}));
+  toast("Could not connect to local storage. Run the CatCB launcher and keep its window open.");
+ }
+ const firstVisible=activeSnippets()[0];
+ // Keep the first snippet preview visible, but do not select it for batch operations on startup.
+ state.selectedId=firstVisible?.id||null;
+ selectedSnippetIds.clear();lastClickedSnippetId=null;
+ applyPrefs();renderNav();renderList();bind();bindContextMenu();persist();loadAppInfo();
+}
+function migrateLegacyDefaults(){
+ if(state.migration.compactStarterSetV12)return;
+ const keep=new Set(["Incident update","DNS lookup (Windows)","Shift handover"]);
+ const keptForMatch=new Set(["Investigation in progress","DNS lookup (Windows)","Handover - next steps"]);
+ const moved=[];
+ state.snippets=state.snippets.filter(s=>{
+  if(!legacy[s.title])return true;
+  const expected=legacy[s.title];
+  if(s.content===expected&&!keep.has(s.title)&&!keptForMatch.has(s.title)){
+   moved.push({...s,deletedAt:new Date().toISOString(),migrationNote:"Unchanged v1.1 starter example"});return false;
+  }
+  return true;
+ });
+ if(moved.length){state.deleted.unshift(...moved);state._migrationNotice=moved.length}
+ state.migration.compactStarterSetV12=true;
+}
+function persist(){
+ clearTimeout(saveTimer);saveTimer=setTimeout(async()=>{
+  try{await api("/api/state",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+   snippets:state.snippets,deleted:state.deleted,categories:allCategories(),categoryIcons:state.categoryIcons,theme:"dark",
+   wallpaper:state.wallpaper,wallpaperOpacity:state.wallpaperOpacity,alwaysTop:state.alwaysTop,migration:state.migration
+  })})}catch(e){setStatus("LOCAL SAVE RETRY");}
+ },100);
+}
+function setStatus(text){$("status").textContent="● "+text.toUpperCase()}
+function applyPrefs(){
+ state.theme="dark";
+ document.body.classList.remove("light");
+ document.body.classList.toggle("no-wallpaper",!state.wallpaper);
+ document.body.style.setProperty("--wallpaper-opacity",String(state.wallpaper?Math.max(.15,Math.min(.78,state.wallpaperOpacity/100)):.0));
+ $("wallpaperText").textContent=state.wallpaper?"Background on":"Background off";
+ $("wallpaperBtn").style.color=state.wallpaper?"var(--accent)":"";
+ $("undoBtn").disabled=historyIndex<=0;
+ $("redoBtn").disabled=historyIndex>=editHistory.length-1;
+}
+function bind(){
+ document.addEventListener("pointerdown",e=>{
+  if(!selectedSnippetIds.size)return;
+  const t=e.target;
+  if(t.closest("#snippetList .snippet-row")||t.closest("#multiToolbar")||t.closest(".section-actions")||t.closest("#contextMenu")||t.closest("input,textarea,select,[contenteditable=\"true\"]"))return;
+  // Clicks on navigation dismiss batch selection; action buttons are left alone so they can act on it.
+  if(t.closest("#nav .nav,#settingsNav,#reportStudioNav")){clearSnippetSelection();return}
+  if(t.closest("button,a"))return;
+  if(t.closest(".app"))clearSnippetSelection();
+ });
+ document.addEventListener("focusin",e=>{if(isTextEditable(e.target))captureEditState(e.target)});
+ document.addEventListener("input",e=>{
+  const el=e.target;
+  if(historyRestore||!isTextEditable(el))return;
+  clearTimeout(historyTimer);
+  historyTimer=setTimeout(()=>captureEditState(el),180);
+ });
+ $("search").addEventListener("input",renderList);
+ $("selectAllVisibleBtn").onclick=selectAllVisibleSnippets;
+ $("clearSelectionBtn").onclick=clearSnippetSelection;
+ $("addBtn").onclick=()=>openEditor();
+ $("editBtn").onclick=()=>{let s=selected();if(s)openEditor(s)};
+ $("deleteBtn").onclick=deleteSelected;
+ $("favoriteBtn").onclick=toggleFavorite;
+ $("copyBtn").onclick=()=>copyFilled(false);
+ $("insertBtn").onclick=()=>copyFilled(true);
+ $("copyRawBtn").onclick=copyRaw;
+ $("copyPreviewBtn").onclick=()=>copyText($("filledPreview").textContent);
+ $("clearVarsBtn").onclick=()=>{["INC","TEAM","HOSTNAME","PORT"].forEach(k=>$("var"+k).value="");renderPreview();toast("Variables cleared")};
+ ["INC","TEAM","HOSTNAME","PORT"].forEach(k=>$("var"+k).addEventListener("input",renderPreview));
+ $("wallpaperBtn").onclick=()=>{state.wallpaper=!state.wallpaper;applyPrefs();persist();toast(state.wallpaper?"Background enabled":"Minimal background enabled")};
+ $("undoBtn").onclick=undoEdit;
+ $("redoBtn").onclick=redoEdit;
+ $("settingsNav").onclick=()=>openSettings();
+ $("moreBtn").onclick=showMore;
+ $("reportStudioNav").onclick=openReportStudio;
+ $("saveEmailDetailsBtn").onclick=saveCurrentEmailDetails;
+ ["emailTo","emailCc","emailBcc","emailFrom","emailSubject"].forEach(id=>{
+  $(id).addEventListener("input",()=>{
+   const s=selected();if(!s||!isEmail(s))return;
+   s.email={to:$("emailTo").value.trim(),cc:$("emailCc").value.trim(),bcc:$("emailBcc").value.trim(),
+    from:$("emailFrom").value.trim(),subject:$("emailSubject").value.trim()};
+   persist();setStatus("Autosaved");
+  });
+ });
+ $("outlookDraftBtn").onclick=()=>createOutlookDraft(false);
+ $("msgDraftBtn").onclick=()=>createOutlookDraft(true);
+ document.addEventListener("keydown",e=>{
+  const editing=isTextEditable(e.target);
+  const inDialog=!!e.target.closest("#modalBackdrop.open, #appDialogBackdrop.open");
+  const mod=e.ctrlKey||e.metaKey;
+  if(!editing&&!inDialog&&mod&&e.key.toLowerCase()==="c"&&selectedSnippetIds.size){e.preventDefault();copySelectedSnippets();return}
+  if(!editing&&!inDialog&&mod&&e.key.toLowerCase()==="x"&&selectedSnippetIds.size){e.preventDefault();cutSelectedSnippets();return}
+  if(!editing&&!inDialog&&mod&&e.key.toLowerCase()==="v"&&snippetClipboard.items.length){e.preventDefault();pasteSnippetBuffer();return}
+  if(!editing&&!inDialog&&mod&&e.key.toLowerCase()==="a"&&(e.target===document.body||e.target.closest(".content-panel")||e.target.closest("#snippetList"))&&state.filter!=="trash") {e.preventDefault();selectAllVisibleSnippets();return}
+  if(!editing&&!inDialog&&e.key==="Delete"&&state.filter!=="trash"&&selectedSnippetIds.size){e.preventDefault();deleteSelected();return}
+  if(e.ctrlKey&&e.key.toLowerCase()==="z"){e.preventDefault();undoEdit();return}
+  if(e.ctrlKey&&e.key.toLowerCase()==="y"){e.preventDefault();redoEdit();return}
+  if(e.ctrlKey&&e.key.toLowerCase()==="f"){e.preventDefault();$("search").focus()}
+  if(e.ctrlKey&&e.key.toLowerCase()==="n"){e.preventDefault();openEditor()}
+  if(e.ctrlKey&&e.key.toLowerCase()==="e"){e.preventDefault();let s=selected();if(s)openEditor(s)}
+  if(e.ctrlKey&&e.key.toLowerCase()==="d"){e.preventDefault();toggleFavorite()}
+  if(e.ctrlKey&&e.key==="Enter"){e.preventDefault();copyFilled(true)}
+  if(e.key==="Escape"){
+   closeModal();
+   if($("search").value){$("search").value="";renderList();return}
+   if(selectedSnippetIds.size){clearSnippetSelection();return}
+  }
+ });
+}
+function allCategories(){return [...new Set([...state.categories,...state.snippets.map(s=>s.category),...state.deleted.map(s=>s.category)].filter(Boolean))].sort((a,b)=>a.localeCompare(b))}
+function selected(){return state.snippets.find(s=>s.id===state.selectedId)||null}
+function activeSnippets(){
+ const q=$("search").value.trim().toLowerCase();
+ return state.snippets.filter(s=>{
+  if(state.filter==="favorites"&&!s.favorite)return false;
+  if(state.filter==="category"&&s.category!==state.category)return false;
+  if(q&&!`${s.title} ${s.category} ${s.content}`.toLowerCase().includes(q))return false;
+  return true;
+ }).sort((a,b)=>(Number(!!b.favorite)-Number(!!a.favorite))||a.title.localeCompare(b.title));
+}
+function selectedSnippetObjects(){
+ return state.snippets.filter(s=>selectedSnippetIds.has(s.id));
+}
+function updateSelectionToolbar(){
+ const valid=new Set(state.snippets.map(s=>s.id));
+ [...selectedSnippetIds].forEach(id=>{if(!valid.has(id))selectedSnippetIds.delete(id)});
+ const count=selectedSnippetIds.size;
+ const bar=$("multiToolbar");
+ if(bar)bar.classList.toggle("visible",count>0);
+ if($("multiSelectionCount"))$("multiSelectionCount").textContent=count===1?"1 selected · Ctrl+C copy · Ctrl+X cut · Ctrl+V paste · Delete remove":`${count} selected · Ctrl+C copy · Ctrl+X cut · Ctrl+V paste · Delete remove`;
+ if($("deleteBtn"))$("deleteBtn").disabled=count===0;
+ if($("editBtn"))$("editBtn").disabled=!selected();
+}
+function cloneSnippet(s){return JSON.parse(JSON.stringify(s))}
+function selectAllVisibleSnippets(){
+ const arr=activeSnippets();
+ selectedSnippetIds.clear();arr.forEach(s=>selectedSnippetIds.add(s.id));
+ if(arr.length){state.selectedId=arr[0].id;lastClickedSnippetId=arr[0].id;renderList();renderDetail();toast(`${selectedSnippetIds.size} snippet(s) selected`)}
+}
+function clearSnippetSelection(){
+ selectedSnippetIds.clear();lastClickedSnippetId=null;renderList();updateSelectionToolbar();
+}
+function selectedTextForClipboard(items){
+ return items.map((s,i)=>`[${i+1}] ${s.title}\nCategory: ${s.category}\n${s.content}`).join("\n\n------------------------------\n\n");
+}
+async function copySelectedSnippets(){
+ const items=selectedSnippetObjects();if(!items.length)return;
+ snippetClipboard={mode:"copy",items:items.map(cloneSnippet)};
+ await copyText(selectedTextForClipboard(items));
+}
+function cutSelectedSnippets(){
+ const items=selectedSnippetObjects();if(!items.length)return;
+ snippetClipboard={mode:"cut",items:items.map(cloneSnippet)};
+ renderList();toast(`${items.length} snippet(s) ready to move. Open a destination category and press Ctrl+V.`);
+}
+function uniqueSnippetTitle(title,category){
+ const existing=new Set(state.snippets.filter(s=>s.category===category).map(s=>s.title.toLowerCase()));
+ let base=title+" (copy)",candidate=base,n=2;
+ while(existing.has(candidate.toLowerCase())){candidate=title+` (copy ${n})`;n++}
+ return candidate;
+}
+function pasteSnippetBuffer(){
+ if(!snippetClipboard.items.length){toast("Copy or cut snippets first.");return}
+ if(snippetClipboard.mode==="cut"){
+  if(state.filter!=="category") {toast("Choose the destination category in the sidebar, then press Ctrl+V to move the cut snippets.");return}
+  const ids=snippetClipboard.items.map(s=>s.id);
+  let moved=0;
+  state.snippets=state.snippets.map(s=>{if(ids.includes(s.id)){moved++;return {...s,category:state.category}}return s});
+  selectedSnippetIds=new Set(ids.filter(id=>state.snippets.some(s=>s.id===id)));
+  state.selectedId=ids[0]||null;lastClickedSnippetId=state.selectedId;
+  snippetClipboard={mode:null,items:[]};
+  if(!state.categories.includes(state.category))state.categories.push(state.category);
+  persist();renderNav();renderList();toast(`Moved ${moved} snippet(s) to ${state.category}`);return;
+ }
+ const targetCategory=state.filter==="category"?state.category:null;
+ const clones=snippetClipboard.items.map(s=>{
+  const c=cloneSnippet(s);c.id=uid();c.category=targetCategory||c.category;c.title=uniqueSnippetTitle(c.title,c.category);delete c.starter;return c;
+ });
+ state.snippets.push(...clones);
+ clones.forEach(s=>{if(!state.categories.includes(s.category))state.categories.push(s.category)});
+ if(targetCategory){state.filter="category";state.category=targetCategory}else{state.filter="all";state.category="All categories"}
+ selectedSnippetIds=new Set(clones.map(s=>s.id));state.selectedId=clones[0]?.id||null;lastClickedSnippetId=state.selectedId;
+ persist();renderNav();renderList();toast(`Pasted ${clones.length} snippet(s)`);
+}
+function renderNav(){
+ const cats=allCategories();
+ const entries=[
+  {kind:"all",icon:"▦",label:"All Snippets",count:state.snippets.length},
+  {kind:"favorites",icon:"★",label:"Favorites",count:state.snippets.filter(s=>s.favorite).length}
+ ];
+ $("nav").innerHTML=`<div class="nav-section" style="padding-top:2px">LIBRARY</div>`+entries.map(n=>navHTML(n)).join("")+
+  `<div class="nav-section">CATEGORIES</div>`+cats.map(c=>navHTML({kind:"category",icon:catIcon(c),label:c,count:state.snippets.filter(s=>s.category===c).length})).join("")+
+  `<button class="add-category-link" id="addCategoryNav">＋  Add category</button>`+
+  `<div class="nav-section">MANAGE</div>`+navHTML({kind:"trash",icon:"⌫",label:"Recycle Bin",count:state.deleted.length});
+ $("nav").querySelectorAll("button.nav").forEach(b=>b.onclick=()=>{
+  selectedSnippetIds.clear();lastClickedSnippetId=null;
+  state.filter=b.dataset.kind;state.category=b.dataset.kind==="category"?b.dataset.label:"All categories";
+  renderNav();renderList();
+ });
+ $("addCategoryNav").onclick=()=>addCategoryQuick();
+}
+function navHTML(n){
+ const active=state.filter===n.kind&&(n.kind!=="category"||state.category===n.label);
+ return `<button class="nav ${active?"active":""}" data-kind="${escAttr(n.kind)}" data-label="${escAttr(n.label)}"><span class="navico">${n.icon}</span><span>${esc(n.label)}</span><span class="navcount">${n.count}</span></button>`;
+}
+function catIcon(cat){return state.categoryIcons?.[cat]||({Commands:"⌘","E-mails":"✉","Shift Handover":"⇄",Troubleshooting:"⌁","Incident Updates":"◉",Requests:"☑",Personal:"♧"})[cat]||"▣"}
+function renderList(){
+ if(state.filter==="trash"){renderTrash();return}
+ const arr=activeSnippets();
+ if(!arr.some(x=>x.id===state.selectedId))state.selectedId=arr[0]?.id||null;
+ updateSelectionToolbar();
+ if(!arr.length){$("snippetList").innerHTML='<div class="empty">No snippets here yet.<br>Add your own text or create a category.</div>';renderDetail();updateSelectionToolbar();return}
+ $("snippetList").innerHTML=arr.map((s,i)=>{
+  const selected=selectedSnippetIds.has(s.id),cut=snippetClipboard.mode==="cut"&&selectedSnippetIds.has(s.id);
+  return `<div class="snippet-row ${selected?"selected":""} ${cut?"cut-mark":""}" data-id="${escAttr(s.id)}" style="animation-delay:${Math.min(i*14,150)}ms">
+   <input type="checkbox" class="snippet-select" data-select-snippet="${escAttr(s.id)}" aria-label="Select ${escAttr(s.title)}" ${selected?"checked":""}>
+   <div class="snip-icon">${esc(s.icon||"☏")}</div><div class="snip-main"><div class="s-title">${s.favorite?"★ ":""}${esc(s.title)}</div><div class="s-sub">${esc(s.content.replace(/\n/g," ").slice(0,76))}${s.content.length>76?"…":""}</div><div class="s-category">${esc(s.category)}</div></div>
+   <button class="star ${s.favorite?"on":""}" data-star="${escAttr(s.id)}" title="Favorite">${s.favorite?"★":"☆"}</button></div>`;
+ }).join("");
+ $("snippetList").querySelectorAll(".snippet-row").forEach(row=>{
+  const id=row.dataset.id;
+  const checkbox=row.querySelector(".snippet-select");
+  checkbox.addEventListener("click",e=>e.stopPropagation());
+  checkbox.addEventListener("change",e=>{
+   if(e.target.checked)selectedSnippetIds.add(id);else selectedSnippetIds.delete(id);
+   state.selectedId=id;lastClickedSnippetId=id;renderList();renderDetail();
+  });
+  row.addEventListener("click",e=>{
+   const star=e.target.closest("[data-star]");
+   if(star){e.stopPropagation();toggleFavorite(star.dataset.star);return}
+   if(e.target.closest(".snippet-select"))return;
+   const current=activeSnippets();
+   if(e.ctrlKey||e.metaKey){
+    if(selectedSnippetIds.has(id))selectedSnippetIds.delete(id);else selectedSnippetIds.add(id);
+   }else if(e.shiftKey&&lastClickedSnippetId){
+    const a=current.findIndex(s=>s.id===lastClickedSnippetId),b=current.findIndex(s=>s.id===id);
+    if(a>=0&&b>=0){selectedSnippetIds.clear();current.slice(Math.min(a,b),Math.max(a,b)+1).forEach(s=>selectedSnippetIds.add(s.id))}
+    else{selectedSnippetIds.clear();selectedSnippetIds.add(id)}
+   }else{selectedSnippetIds.clear();selectedSnippetIds.add(id)}
+   state.selectedId=id;lastClickedSnippetId=id;renderList();renderDetail();
+  });
+ });
+ renderDetail();updateSelectionToolbar();
+}
+function renderTrash(){
+ state.selectedId=null;selectedSnippetIds.clear();lastClickedSnippetId=null;
+ if($("multiToolbar"))$("multiToolbar").classList.remove("visible");
+ $("emailFields").classList.remove("visible");
+ $("emailActions").classList.remove("visible");
+ ["emailTo","emailCc","emailBcc","emailFrom","emailSubject"].forEach(id=>$(id).value="");
+ lastDetailLoadedId=null;
+ $("snippetList").innerHTML=state.deleted.length?state.deleted.map(s=>`<div class="snippet-row" style="grid-template-columns:29px minmax(0,1fr) auto auto"><div class="snip-icon">⌫</div><div class="snip-main"><div class="s-title">${esc(s.title)}</div><div class="s-sub">${esc(s.category||"Other")}</div></div><button class="tiny" data-restore="${escAttr(s.id)}">Restore</button><button class="tiny" data-permanent="${escAttr(s.id)}" title="Permanently delete">×</button></div>`).join(""):'<div class="empty">Recycle Bin is empty.</div>';
+ $("snippetList").querySelectorAll("[data-restore]").forEach(b=>b.onclick=()=>{const i=state.deleted.findIndex(s=>s.id===b.dataset.restore);if(i>=0){const obj=state.deleted.splice(i,1)[0];delete obj.deletedAt;delete obj.migrationNote;state.snippets.push(obj);state.selectedId=obj.id}persist();renderNav();renderList();toast("Snippet restored")});
+ $("snippetList").querySelectorAll("[data-permanent]").forEach(b=>b.onclick=async()=>{
+  const s=state.deleted.find(x=>x.id===b.dataset.permanent);if(!s)return;
+  if(await catConfirm("Permanently delete?",`“${s.title}” will be removed permanently. This cannot be undone.`,{okLabel:"Delete permanently",danger:true,icon:"⌫"})){
+   state.deleted=state.deleted.filter(x=>x.id!==s.id);persist();renderNav();renderList();toast("Permanently deleted");
+  }
+ });
+ $("detailTitle").textContent="Recycle Bin";
+ $("detailCategory").textContent=state.deleted.length+" item(s)";
+ $("detailGlyph").textContent="⌫";
+ $("templateText").textContent="Deleted snippets stay here until you restore them or permanently delete them.";
+ $("filledPreview").textContent="";
+ $("favoriteBtn").disabled=true;
+ $("editBtn").disabled=true;
+ $("deleteBtn").disabled=true;
+ $("copyBtn").disabled=true;
+ $("insertBtn").disabled=true;
+}
+let lastDetailLoadedId=null;
+function isEmail(s){return !!s&&(String(s.category||"").toLowerCase().replace(/[-\s]/g,"").includes("email")||!!s.emailTemplate||!!s.email)}
+function loadEmailDetails(s){
+ const panel=$("emailFields"), actions=$("emailActions");
+ const enabled=isEmail(s);
+ panel.classList.toggle("visible",enabled);
+ actions.classList.toggle("visible",enabled);
+ if(!enabled){
+  ["emailTo","emailCc","emailBcc","emailFrom","emailSubject"].forEach(id=>$(id).value="");
+  lastDetailLoadedId=s?.id||null;
+  return;
+ }
+ if(lastDetailLoadedId!==s.id){
+  const e=s.email||{};
+  $("emailTo").value=e.to||s.to||"";
+  $("emailCc").value=e.cc||s.cc||"";
+  $("emailBcc").value=e.bcc||s.bcc||"";
+  $("emailFrom").value=e.from||s.from||"";
+  $("emailSubject").value=e.subject||s.subject||s.title||"";
+  lastDetailLoadedId=s.id;
+  loadOutlookAccounts(false);
+ }
+}
+function renderDetail(){
+ const s=selected();
+ $("favoriteBtn").disabled=$("editBtn").disabled=$("deleteBtn").disabled=$("copyBtn").disabled=$("insertBtn").disabled=!s;
+ loadEmailDetails(s);
+ $("detailTitle").textContent=s?s.title:"No snippet selected";
+ $("detailCategory").textContent=s?s.category:"—";
+ $("detailGlyph").textContent=s?(s.icon||catIcon(s.category)):"✦";
+ $("templateText").textContent=s?s.content:"Select a snippet from the library or add your first one.";
+ $("favoriteBtn").textContent=s&&s.favorite?"★":"☆";
+ $("detail").style.opacity=s?"1":".82";
+ renderPreview();
+}
+function renderPreview(){
+ const s=selected();if(!s){$("filledPreview").textContent="";return}
+ let text=s.content;
+ ["INC","TEAM","HOSTNAME","PORT"].forEach(k=>{const v=$("var"+k).value.trim();if(v)text=text.replaceAll("{{"+k+"}}",v)});
+ $("filledPreview").textContent=text;
+}
+function toggleFavorite(id=state.selectedId){
+ const s=state.snippets.find(x=>x.id===id);if(!s)return;
+ s.favorite=!s.favorite;persist();renderNav();renderList();setStatus(s.favorite?"Added to favorites":"Removed from favorites");
+}
+function openEditor(item=null){
+ if(state.filter==="trash")state.filter="all";
+ const editing=!!item;
+ $("modal").innerHTML=`<h2>${editing?"Edit snippet":"Create your snippet"}</h2><p>Keep only the snippets you use. Categories are customizable in Settings.</p>
+ <div class="form-grid">
+  <div class="form-field"><label for="fTitle">SNIPPET NAME</label><input id="fTitle" maxlength="120" placeholder="e.g. Investigation update" value="${escAttr(item?.title||"")}"></div>
+  <div class="form-field"><label for="fCategory">CATEGORY</label><input id="fCategory" list="catOptions" value="${escAttr(item?.category||(state.filter==="category"&&state.category!=="All categories"?state.category:"Incident Updates"))}" placeholder="Create or choose category"><datalist id="catOptions">${allCategories().map(c=>`<option value="${escAttr(c)}">`).join("")}</datalist></div>
+  <div class="form-field full"><label for="fContent">SNIPPET TEXT</label><textarea id="fContent" placeholder="Type your reusable text here…">${esc(item?.content||"")}</textarea></div>
+  <div class="form-field"><label for="fIcon">ICON (OPTIONAL)</label><input id="fIcon" maxlength="8" value="${escAttr(item?.icon||catIcon(item?.category||"Incident Updates"))}" placeholder="☏"></div>
+  <div class="form-field"><label class="checkline"><input id="fFavorite" type="checkbox" ${item?.favorite?"checked":""}> Add to favorites</label></div>
+ </div>
+ <div class="form-grid" id="emailEditorFields" style="display:${isEmail(item)||String(item?.category||"").toLowerCase().replace(/[-\s]/g,"").includes("email")?"grid":"none"};margin-top:14px;padding:13px;border:1px solid var(--line);border-radius:12px;background:rgba(12,25,38,.48)">
+  <div class="form-field full"><label style="color:var(--blue)">✉ OUTLOOK TEMPLATE DETAILS</label></div>
+  <div class="form-field full"><label for="fEmailTo">TO</label><input id="fEmailTo" value="${escAttr(item?.email?.to||"")}" placeholder="recipient@company.com; another@company.com"></div>
+  <div class="form-field"><label for="fEmailCc">CC</label><input id="fEmailCc" value="${escAttr(item?.email?.cc||"")}" placeholder="Optional"></div>
+  <div class="form-field"><label for="fEmailBcc">BCC</label><input id="fEmailBcc" value="${escAttr(item?.email?.bcc||"")}" placeholder="Optional"></div>
+  <div class="form-field full"><label for="fEmailFrom">FROM / SHARED MAILBOX</label><input id="fEmailFrom" list="outlookAccountsEditor" value="${escAttr(item?.email?.from||"")}" placeholder="Default account or shared mailbox address"><datalist id="outlookAccountsEditor"></datalist></div>
+  <div class="form-field full"><label for="fEmailSubject">SUBJECT</label><input id="fEmailSubject" value="${escAttr(item?.email?.subject||"")}" placeholder="Email subject"></div>
+ </div>
+ <div class="modal-actions"><span class="muted" style="font-size:10px">Variables: {{INC}} · {{TEAM}} · {{HOSTNAME}} · {{PORT}}</span><div class="right"><button id="cancelModal">Close</button><button class="primary" id="saveModal">Save &amp; close ↗</button></div></div>`;
+ openModal();
+ $("cancelModal").onclick=()=>{clearTimeout(autoSaveTimer);closeModal();renderNav();renderList();toast("Any changes were autosaved")};
+ const categoryInput=$("fCategory");
+ const emailEditor=$("emailEditorFields");
+ const updateEmailEditor=()=>{emailEditor.style.display=String(categoryInput.value||"").toLowerCase().replace(/[-\s]/g,"").includes("email")?"grid":"none";};
+ categoryInput.addEventListener("input",updateEmailEditor);
+ loadOutlookAccounts(true);
+ let autoItemId=item?.id||null;
+ let autoSaveTimer=null;
+ const autosaveEditor=()=>{
+  clearTimeout(autoSaveTimer);
+  autoSaveTimer=setTimeout(()=>{
+   const title=$("fTitle").value.trim(),content=$("fContent").value,category=$("fCategory").value.trim()||"Other";
+   // Avoid creating empty records while the user is just opening the form.
+   if(!title&&!content.trim())return;
+   const obj={id:autoItemId||uid(),title:title||"Untitled snippet",category,content,
+    icon:$("fIcon").value.trim()||catIcon(category),favorite:$("fFavorite").checked};
+   if(String(category).toLowerCase().replace(/[-\s]/g,"").includes("email")){
+    obj.email={to:$("fEmailTo").value.trim(),cc:$("fEmailCc").value.trim(),bcc:$("fEmailBcc").value.trim(),
+     from:$("fEmailFrom").value.trim(),subject:$("fEmailSubject").value.trim()};
+   }else if(item?.email)obj.email=item.email;
+   autoItemId=obj.id;
+   const idx=state.snippets.findIndex(s=>s.id===obj.id);
+   if(idx>=0)state.snippets[idx]={...state.snippets[idx],...obj};else state.snippets.push(obj);
+   if(category&&!state.categories.includes(category))state.categories.push(category);
+   state.selectedId=obj.id;
+   persist();setStatus("Autosaved");renderNav();
+  },220);
+ };
+ ["fTitle","fCategory","fContent","fIcon","fFavorite","fEmailTo","fEmailCc","fEmailBcc","fEmailFrom","fEmailSubject"].forEach(id=>{
+  const el=$(id);if(el)el.addEventListener("input",autosaveEditor);
+  if(el&&el.type==="checkbox")el.addEventListener("change",autosaveEditor);
+ });
+ $("saveModal").onclick=()=>{
+  clearTimeout(autoSaveTimer);
+  const title=$("fTitle").value.trim(),content=$("fContent").value.trim(),category=$("fCategory").value.trim()||"Other";
+  if(!title||!content){toast("Add a name and snippet text first");return}
+  const obj={id:item?.id||autoItemId||uid(),title,category,content,icon:$("fIcon").value.trim()||catIcon(category),favorite:$("fFavorite").checked};
+  if(category.toLowerCase().replace(/[-\s]/g,"").includes("email")){
+   obj.email={to:$("fEmailTo").value.trim(),cc:$("fEmailCc").value.trim(),bcc:$("fEmailBcc").value.trim(),
+    from:$("fEmailFrom").value.trim(),subject:$("fEmailSubject").value.trim()};
+  } else if(item?.email){obj.email=item.email;}
+  if(editing||state.snippets.some(s=>s.id===obj.id))state.snippets=state.snippets.map(s=>s.id===obj.id?{...s,...obj}:s);else state.snippets.push(obj);
+  if(!state.categories.includes(category))state.categories.push(category);
+  state.selectedId=obj.id;state.filter="all";state.category="All categories";$("search").value="";
+  lastDetailLoadedId=null;
+  closeModal();persist();renderNav();renderList();toast(editing?"Snippet updated":"Snippet added");
+ };
+ $("fTitle").focus();
+}
+async function deleteSelected(){
+ const items=selectedSnippetObjects();
+ if(!items.length)return;
+ const message=items.length===1?`“${items[0].title}” will be moved to the Recycle Bin. You can restore it later.`:`${items.length} selected snippets will be moved to the Recycle Bin. You can restore them later.`;
+ if(await catConfirm(items.length===1?"Move to Recycle Bin?":"Move selected snippets to Recycle Bin?",message,{okLabel:items.length===1?"Move to bin":`Move ${items.length} items`,danger:true,icon:"⌫"})){
+  const ids=new Set(items.map(s=>s.id));
+  state.snippets=state.snippets.filter(s=>{if(ids.has(s.id)){state.deleted.unshift({...s,deletedAt:new Date().toISOString()});return false}return true});
+  selectedSnippetIds.clear();lastClickedSnippetId=null;state.selectedId=null;
+  if(snippetClipboard.mode==="cut"&&snippetClipboard.items.some(s=>ids.has(s.id)))snippetClipboard={mode:null,items:[]};
+  persist();renderNav();renderList();toast(`Moved ${items.length} snippet(s) to Recycle Bin`);
+ }
+}
+let outlookAccountsLoaded=false;
+async function loadOutlookAccounts(forEditor=false){
+ if(outlookAccountsLoaded)return;
+ try{
+  const r=await fetch("/api/outlook/accounts");
+  const data=await r.json();
+  if(!r.ok)throw Error(data.error||"Outlook accounts unavailable");
+  const markup=(data.accounts||[]).map(a=>`<option value="${escAttr(a.email||a.name)}">${esc(a.name||a.email)}</option>`).join("");
+  ["outlookAccounts","outlookAccountsEditor","studioAccounts"].forEach(id=>{const el=$(id);if(el)el.innerHTML=markup});
+  outlookAccountsLoaded=true;
+ }catch(e){
+  // Free-text addresses still work even when Outlook isn't available during template editing.
+  if(!forEditor && $("emailFields").classList.contains("visible"))setStatus("OUTLOOK ACCOUNT LIST UNAVAILABLE");
+ }
+}
+async function createOutlookDraft(saveMsg){
+ const s=selected();if(!s)return;
+ const subject=$("emailSubject").value.trim()||s.title;
+ const body=await buildFilledText(true);
+ const payload={to:$("emailTo").value.trim(),cc:$("emailCc").value.trim(),bcc:$("emailBcc").value.trim(),
+  from_address:$("emailFrom").value.trim(),subject,body,save_msg:!!saveMsg,filename:subject};
+ const btn=saveMsg?$("msgDraftBtn"):$("outlookDraftBtn");
+ btn.disabled=true;btn.textContent=saveMsg?"Creating .msg…":"Opening Outlook…";
+ try{
+  const r=await fetch("/api/email/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  const data=await r.json();
+  if(!r.ok)throw Error(data.error||"Outlook couldn't create the draft");
+  toast(saveMsg?`Saved .msg: ${data.path||data.saved_msg||"see Documents\\CatCB\\EmailDrafts"}`:"Outlook draft opened — review before sending");
+  setStatus(saveMsg?"MSG CREATED":"OUTLOOK DRAFT OPENED");
+ }catch(e){
+  await catAlert("Couldn't open Outlook", "CatCB couldn't create the Outlook draft.\n\n"+e.message+"\n\nThis feature requires Outlook Classic and pywin32 on this Windows computer. CatCB will never send the email automatically.",{icon:"✉",okLabel:"Understood"});
+ }finally{
+  btn.disabled=false;btn.innerHTML=saveMsg?"▣ &nbsp; Save .msg + open":"✉ &nbsp; Open Outlook draft";
+ }
+}
+async function buildFilledText(promptMissing=false){
+ const s=selected();if(!s)return "";
+ let text=s.content;
+ const tokens=[...new Set(text.match(/\{\{([A-Z0-9_]+)\}\}/g)||[])];
+ for(const token of tokens){
+  const key=token.slice(2,-2);let v=$("var"+key)?.value?.trim()||"";
+  if(!v&&promptMissing){
+   const answer=await catPrompt("Fill template variable",`Enter a value for ${key.replace("_"," ").toLowerCase()}.`,"",{inputLabel:key.replace("_"," ").toUpperCase(),placeholder:`Value for ${key.toLowerCase()}`,okLabel:"Use value",icon:"✎"});
+   if(answer===null)return "";
+   v=answer.trim();if($("var"+key))$("var"+key).value=v;
+  }
+  if(v)text=text.replaceAll(token,v);
+ }
+ renderPreview();return text;
+}
+function copyRaw(){const s=selected();if(s)copyText(s.content)}
+async function copyFilled(forcePrompt=false){
+ const s=selected();if(!s)return;
+ const text=await buildFilledText(forcePrompt);if(text==="")return;
+ await copyText(text);
+}
+async function copyText(text){
+ try{await navigator.clipboard.writeText(text);toast("✓ Copied to clipboard")}
+ catch(e){const ta=document.createElement("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();const ok=document.execCommand("copy");ta.remove();toast(ok?"✓ Copied to clipboard":"Clipboard access was blocked")}
+}
+
+const REPORT_DEFAULT_TO="";
+const REPORT_DEFAULT_CC="";
+function todayDDMMYYYY(){
+ const d=new Date();return `${String(d.getDate()).padStart(2,"0")}.${String(d.getMonth()+1).padStart(2,"0")}.${d.getFullYear()}`;
+}
+function reportDefaultBody(){
+ return `Hi all,\n\nPlease find the attached IT operations report for {{REPORT_DATE}}.\n\nThis report is prepared for operational review and follow-up with the relevant teams.\n\nBest regards,`;
+}
+function openReportStudio(){
+ const savedEmails=state.snippets.filter(isEmail);
+ const options=savedEmails.map(s=>`<option value="${escAttr(s.id)}">${esc(s.title)}</option>`).join("");
+ $("modal").className="modal report-studio";
+ $("modal").innerHTML=`<div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:18px">
+  <div class="detail-glyph" style="background:rgba(168,243,109,.12);color:var(--accent)">✉</div>
+  <div style="flex:1"><h2>Report & Outlook Studio</h2><p style="margin-bottom:0">Prepare the Long Running Network Incident Report or any email template, attach a report file, and open it as a draft in Outlook.</p></div>
+  <span class="pill">OUTLOOK</span>
+ </div>
+ <div class="studio-layout">
+  <div class="studio-card">
+   <h3>01 · TEMPLATE & RECIPIENTS</h3>
+   <div class="studio-field"><label for="studioTemplateSelect">LOAD SAVED EMAIL TEMPLATE</label><select id="studioTemplateSelect"><option value="">New report email</option>${options}</select></div>
+   <div class="studio-field"><label for="studioTemplateName">TEMPLATE NAME (FOR SAVING)</label><input id="studioTemplateName" value="IT operations report" placeholder="Email template name"></div>
+   <div class="studio-field"><label for="studioTo">TO</label><input id="studioTo" list="studioAccounts" value="${REPORT_DEFAULT_TO}" placeholder="recipient@company.com; next@company.com"></div>
+   <datalist id="studioAccounts"></datalist>
+   <div class="studio-field"><label for="studioCc">CC</label><input id="studioCc" list="studioAccounts" value="${REPORT_DEFAULT_CC}" placeholder="Optional"></div>
+   <div class="studio-field"><label for="studioBcc">BCC</label><input id="studioBcc" list="studioAccounts" placeholder="Optional"></div>
+   <div class="studio-field"><label for="studioFrom">FROM / SHARED MAILBOX</label><input id="studioFrom" list="studioAccounts" placeholder="Default Outlook account or shared mailbox"></div>
+   <div class="studio-field"><label for="studioSubject">SUBJECT</label><input id="studioSubject" value="IT operations report ${todayDDMMYYYY()}" placeholder="Email subject"></div>
+   <div class="studio-badges"><span>To / CC / BCC</span><span>Shared mailbox</span><span>Reusable template</span></div>
+  </div>
+  <div class="studio-card">
+   <h3>02 · MESSAGE & REPORT FILE</h3>
+   <div class="studio-field"><label for="studioBody">EMAIL BODY</label><textarea id="studioBody" placeholder="Write your message…">${esc(reportDefaultBody())}</textarea></div>
+   <div class="attachment-box">
+    <div style="font-size:11px;font-weight:750;margin-bottom:4px">📎 ATTACH REPORT FILE(S)</div>
+    <div class="muted" style="font-size:10px;line-height:1.45">Select the Excel, PowerPoint or other report file you want attached. Files remain local and are attached directly to the Outlook draft.</div>
+    <input type="file" id="studioAttachments" multiple>
+    <div id="studioAttachmentList" class="attachment-list">No attachments selected</div>
+   </div>
+   <div class="studio-badges"><span>{{REPORT_DATE}}</span><span>{{REPORT_FILENAME}}</span><span>{{INC}}</span><span>{{TEAM}}</span></div>
+   <div class="muted" style="font-size:10px;line-height:1.45;margin-top:9px">Date and filename tokens are filled at creation time. Outlook drafts are opened for review; CatCB never sends mail automatically.</div>
+  </div>
+ </div>
+ <div class="modal-actions" style="margin-top:16px;flex-wrap:wrap">
+  <span class="muted" style="font-size:10px">CatCB™ · Made by Bejlint 💚</span>
+  <div class="right" style="flex-wrap:wrap;justify-content:flex-end">
+   <button id="studioClose">Close</button>
+   <button id="studioSaveTemplate">Save as email template</button>
+   <button id="studioDraft" class="primary">✉ Open Outlook draft</button>
+   <button id="studioMsg">▣ Save .msg + open</button>
+  </div>
+ </div>`;
+ openModal();
+ loadOutlookAccounts(true);
+ const fileInput=$("studioAttachments");
+ fileInput.onchange=renderAttachmentList;
+ $("studioClose").onclick=closeModal;
+ $("studioSaveTemplate").onclick=saveStudioTemplate;
+ $("studioDraft").onclick=()=>sendStudioEmail(false);
+ $("studioMsg").onclick=()=>sendStudioEmail(true);
+ $("studioTemplateSelect").onchange=()=>loadStudioTemplate($("studioTemplateSelect").value);
+ const studioAutosave=()=>{
+  const id=$("studioTemplateSelect").value;
+  const s=state.snippets.find(x=>x.id===id);if(!s||!isEmail(s))return;
+  s.title=$("studioTemplateName").value.trim()||s.title;
+  s.content=$("studioBody").value;
+  s.email={to:$("studioTo").value.trim(),cc:$("studioCc").value.trim(),bcc:$("studioBcc").value.trim(),
+   from:$("studioFrom").value.trim(),subject:$("studioSubject").value.trim()};
+  persist();setStatus("Autosaved");
+ };
+ ["studioTemplateName","studioTo","studioCc","studioBcc","studioFrom","studioSubject","studioBody"].forEach(id=>{
+  $(id).addEventListener("input",studioAutosave);
+ });
+}
+function renderAttachmentList(){
+ const files=[...$("studioAttachments").files];
+ if(!files.length){$("studioAttachmentList").textContent="No attachments selected";return}
+ const bytes=files.reduce((n,f)=>n+f.size,0);
+ $("studioAttachmentList").textContent=files.map(f=>`${f.name} · ${formatBytes(f.size)}`).join("  |  ")+` · Total ${formatBytes(bytes)}`;
+}
+function formatBytes(n){if(n<1024)return n+" B";if(n<1048576)return (n/1024).toFixed(0)+" KB";return (n/1048576).toFixed(1)+" MB"}
+function loadStudioTemplate(id){
+ const s=state.snippets.find(x=>x.id===id);if(!s)return;
+ $("studioTemplateName").value=s.title;
+ $("studioTo").value=s.email?.to||"";
+ $("studioCc").value=s.email?.cc||"";
+ $("studioBcc").value=s.email?.bcc||"";
+ $("studioFrom").value=s.email?.from||"";
+ $("studioSubject").value=s.email?.subject||s.title;
+ $("studioBody").value=s.content;
+}
+function studioPayload(){
+ const date=todayDDMMYYYY();
+ const files=[...$("studioAttachments").files];
+ const total=files.reduce((n,f)=>n+f.size,0);
+ if(total>24*1024*1024)throw new Error("Please keep total attachments under 24 MB for this first version.");
+ const name=files.map(f=>f.name).join(", ");
+ let body=$("studioBody").value;
+ body=body.replaceAll("{{REPORT_DATE}}",date).replaceAll("{{REPORT_FILENAME}}",name||"(no attachment selected)");
+ ["INC","TEAM","HOSTNAME","PORT"].forEach(k=>{const v=$("var"+k)?.value?.trim();if(v)body=body.replaceAll("{{"+k+"}}",v)});
+ return {date,files,subject:$("studioSubject").value.trim().replaceAll("{{REPORT_DATE}}",date).replaceAll("{{DATE}}",date),
+  body,to:$("studioTo").value.trim(),cc:$("studioCc").value.trim(),bcc:$("studioBcc").value.trim(),
+  from_address:$("studioFrom").value.trim(),filename:$("studioSubject").value.trim().replaceAll("{{REPORT_DATE}}",date)||"CatCB_Report",
+  attachments:files};
+}
+async function fileToPayload(file){
+ const buffer=await file.arrayBuffer();
+ const bytes=new Uint8Array(buffer);let binary="";
+ const step=0x8000;
+ for(let i=0;i<bytes.length;i+=step)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+step,bytes.length)));
+ return {name:file.name,content_base64:btoa(binary)};
+}
+async function sendStudioEmail(saveMsg){
+ let p;
+ try{p=studioPayload()}catch(e){toast(e.message);return}
+ if(!p.to&&!(await catConfirm("No recipient specified", "The To field is empty. Do you still want to open this Outlook draft?",{okLabel:"Open anyway",icon:"✉"})))return;
+ const button=saveMsg?$("studioMsg"):$("studioDraft");
+ const oldText=button.textContent;button.disabled=true;button.textContent=saveMsg?"Creating .msg…":"Preparing Outlook…";
+ try{
+  const attachments=[];
+  for(const file of p.files)attachments.push(await fileToPayload(file));
+  const req={to:p.to,cc:p.cc,bcc:p.bcc,from_address:p.from_address,subject:p.subject,body:p.body,
+    filename:p.filename,save_msg:!!saveMsg,attachments};
+  const response=await fetch("/api/email/create",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(req)});
+  const result=await response.json();
+  if(!response.ok)throw new Error(result.error||"Outlook draft creation failed.");
+  const path=result.path||result.saved_msg;
+  closeModal();
+  if(saveMsg&&path)await catAlert("MSG draft saved", "The .msg file was saved and the draft was opened in Outlook.\n\nLocation:\n"+path,{icon:"✓",okLabel:"Perfect"});
+  else toast("Outlook draft opened. Please review it before sending.");
+  setStatus(saveMsg?"MSG FILE CREATED":"OUTLOOK DRAFT OPENED");
+ }catch(e){await catAlert("Outlook draft unavailable", "CatCB couldn't create the Outlook draft.\n\n"+e.message+"\n\nRequirements: Outlook Classic configured on this Windows computer and pywin32 available to CatCB. Nothing is sent automatically.",{icon:"✉",okLabel:"Understood"});}
+ finally{if(button.isConnected){button.disabled=false;button.textContent=oldText}}
+}
+function saveStudioTemplate(){
+ const title=$("studioTemplateName").value.trim()||"Email template";
+ const category="E-mails";
+ const content=$("studioBody").value.trim();
+ if(!content){toast("Write an email body first");return}
+ const selectedId=$("studioTemplateSelect").value;
+ const existing=state.snippets.find(s=>s.id===selectedId);
+ const email={to:$("studioTo").value.trim(),cc:$("studioCc").value.trim(),bcc:$("studioBcc").value.trim(),
+  from:$("studioFrom").value.trim(),subject:$("studioSubject").value.trim()};
+ const item={id:existing?.id||uid(),title,category,content,icon:"✉",favorite:existing?.favorite||false,email};
+ if(existing)state.snippets=state.snippets.map(s=>s.id===existing.id?item:s);else state.snippets.push(item);
+ if(!state.categories.includes(category))state.categories.push(category);
+ state.selectedId=item.id;state.filter="all";state.category="All categories";
+ persist();renderNav();renderList();$("studioTemplateSelect").innerHTML='<option value="">New report email</option>'+state.snippets.filter(isEmail).map(s=>`<option value="${escAttr(s.id)}">${esc(s.title)}</option>`).join("");
+ $("studioTemplateSelect").value=item.id;
+ toast("Email template saved in the E-mails category");
+}
+function saveCurrentEmailDetails(){
+ const s=selected();if(!s||!isEmail(s))return;
+ s.email={to:$("emailTo").value.trim(),cc:$("emailCc").value.trim(),bcc:$("emailBcc").value.trim(),
+  from:$("emailFrom").value.trim(),subject:$("emailSubject").value.trim()};
+ persist();toast("Outlook details saved to this template");
+}
+async function loadConfigPaths(){
+ try{
+  const res=await fetch("/api/paths");const data=await res.json();if(!res.ok)throw Error(data.error||"Path lookup failed");
+  $("configPathText").textContent=data.config_file;$("configFolderText").textContent=data.config_dir;$("draftFolderText").textContent=data.email_drafts_dir;
+  $("copyConfigPath").onclick=()=>copyText(data.config_file);
+  $("openConfigFolder").onclick=()=>openLocalPath("config_folder");
+  $("openConfigFile").onclick=()=>openLocalPath("config_file");
+  $("openDraftFolder").onclick=()=>openLocalPath("draft_folder");
+ }catch(e){
+  $("configPathText").textContent="%APPDATA%\\CatCB\\state.json";
+  $("configFolderText").textContent="%APPDATA%\\CatCB";
+  $("draftFolderText").textContent="%USERPROFILE%\\Documents\\CatCB\\EmailDrafts";
+  $("copyConfigPath").onclick=()=>copyText("%APPDATA%\\CatCB\\state.json");
+  $("openConfigFolder").onclick=()=>toast("Run CatCB using the local launcher to open the folder");
+ }
+}
+async function openLocalPath(which){
+ try{
+  const response=await fetch("/api/open-path",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({which})});
+  const data=await response.json();if(!response.ok)throw Error(data.error||"Couldn't open path");
+  toast("Opened "+which.replace("_"," "));
+ }catch(e){toast(e.message)}
+}
+
+function closeContextMenu(){
+ const menu=$("contextMenu");if(menu)menu.classList.remove("open");
+}
+function showContextMenu(x,y,heading,items){
+ const menu=$("contextMenu");
+ menu.innerHTML=`<div class="cm-heading">${esc(heading||"CATCB QUICK ACTIONS")}</div>`+
+  items.map((it,i)=>it.divider?'<div class="cm-divider"></div>':
+   `<button role="menuitem" class="${it.danger?"danger":""}" data-cm-index="${i}"><span>${esc(it.icon||"•")}</span><span>${esc(it.label)}</span></button>`).join("")+
+  `<div class="context-hint">CatCB · Made by Bejlint 💚</div>`;
+ menu.classList.add("open");
+ const maxX=window.innerWidth-menu.offsetWidth-8,maxY=window.innerHeight-menu.offsetHeight-8;
+ menu.style.left=Math.max(8,Math.min(x,maxX))+"px";
+ menu.style.top=Math.max(8,Math.min(y,maxY))+"px";
+ menu.querySelectorAll("[data-cm-index]").forEach(btn=>{
+  btn.onclick=()=>{
+   const item=items[Number(btn.dataset.cmIndex)];
+   closeContextMenu();
+   if(item&&typeof item.action==="function")item.action();
+  };
+ });
+}
+function categoryContextItems(name){
+ return [
+  {icon:"＋",label:"Add snippet in this category",action:()=>{state.filter="category";state.category=name;openEditor()}},
+  {icon:"✎",label:"Rename category",action:()=>renameCategory(name)},
+  {icon:catIcon(name),label:"Change category icon",action:()=>changeCategoryIcon(name)},
+  {divider:true},
+  {icon:"⌫",label:"Delete category",danger:true,action:()=>deleteCategory(name)}
+ ];
+}
+function multiSnippetContextItems(){
+ const count=selectedSnippetIds.size;
+ return [
+  {icon:"⧉",label:`Copy ${count} selected snippet(s)`,action:copySelectedSnippets},
+  {icon:"✂",label:`Cut ${count} selected snippet(s)`,action:cutSelectedSnippets},
+  {icon:"▣",label:`Duplicate ${count} selected snippet(s)`,action:()=>{snippetClipboard={mode:"copy",items:selectedSnippetObjects().map(cloneSnippet)};pasteSnippetBuffer()}},
+  {icon:"⌫",label:`Move ${count} selected snippet(s) to Recycle Bin`,danger:true,action:deleteSelected}
+ ];
+}
+function snippetContextItems(s){
+ return [
+  {icon:"✎",label:"Edit snippet",action:()=>openEditor(s)},
+  {icon:"▣",label:"Duplicate snippet",action:()=>{const copy={...s,id:uid(),title:s.title+" (copy)",favorite:false};state.snippets.push(copy);state.selectedId=copy.id;persist();renderNav();renderList();toast("Snippet duplicated")}},
+  {icon:s.favorite?"★":"☆",label:s.favorite?"Remove from favorites":"Add to favorites",action:()=>toggleFavorite(s.id)},
+  {icon:"⧉",label:"Copy original text",action:()=>copyText(s.content)},
+  {divider:true},
+  {icon:"⌫",label:"Move to Recycle Bin",danger:true,action:()=>{state.selectedId=s.id;deleteSelected()}}
+ ];
+}
+function showGlobalContextItems(){
+ return [
+  {icon:"＋",label:"New snippet",action:()=>openEditor()},
+  {icon:"▦",label:"Create category",action:addCategoryQuick},
+  {icon:"☑",label:"Select all visible snippets",action:selectAllVisibleSnippets},
+  {icon:"⚙",label:"Settings",action:()=>openSettings()},
+  {divider:true},
+  {icon:"↶",label:"Undo",action:undoEdit},
+  {icon:"↷",label:"Redo",action:redoEdit}
+ ];
+}
+function onAppContextMenu(e){
+ const menu=$("contextMenu");
+ if(e.target.closest("#contextMenu")){e.preventDefault();return}
+ // Keep the native edit menu for text boxes, so copy/paste/select-all work as users expect.
+ if(e.target.closest('input,textarea,select,[contenteditable="true"]'))return;
+ // Avoid replacing context menus inside modal controls; the app menu remains available on the rest of the workspace.
+ if(e.target.closest("#modal"))return;
+ e.preventDefault();
+ const row=e.target.closest(".snippet-row[data-id]");
+ if(row&&!row.querySelector("[data-restore]")){
+  const s=state.snippets.find(x=>x.id===row.dataset.id);
+  if(s){
+   if(!selectedSnippetIds.has(s.id)){selectedSnippetIds.clear();selectedSnippetIds.add(s.id)}
+   state.selectedId=s.id;lastClickedSnippetId=s.id;renderList();
+   const items=selectedSnippetIds.size>1?multiSnippetContextItems():snippetContextItems(s);
+   showContextMenu(e.clientX,e.clientY,selectedSnippetIds.size>1?`${selectedSnippetIds.size} snippets selected`:s.title,items);return
+  }
+ }
+ const nav=e.target.closest('.nav[data-kind="category"]');
+ if(nav){const name=nav.dataset.label;showContextMenu(e.clientX,e.clientY,name,categoryContextItems(name));return}
+ const catRow=e.target.closest(".category-manage[data-category-row]");
+ if(catRow){const name=catRow.dataset.categoryRow;showContextMenu(e.clientX,e.clientY,name,categoryContextItems(name));return}
+ if(e.target.closest("#search")){
+  showContextMenu(e.clientX,e.clientY,"SEARCH",[
+   {icon:"⌕",label:"Focus search",action:()=>$("search").focus()},
+   {icon:"×",label:"Clear search",action:()=>{$("search").value="";renderList()}},
+   {divider:true},...showGlobalContextItems()
+  ]);return;
+ }
+ showContextMenu(e.clientX,e.clientY,"CATCB QUICK ACTIONS",showGlobalContextItems());
+}
+function bindContextMenu(){
+ document.addEventListener("contextmenu",onAppContextMenu);
+ document.addEventListener("pointerdown",e=>{if(!e.target.closest("#contextMenu"))closeContextMenu()});
+ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeContextMenu()});
+ window.addEventListener("resize",closeContextMenu);
+ document.addEventListener("scroll",closeContextMenu,true);
+}
+
+let activeAppDialogResolve=null;
+function appDialog(options={}){
+ const kind=options.kind||"alert";
+ const title=options.title||"CatCB";
+ const message=options.message||"";
+ const defaultValue=options.value??"";
+ const inputLabel=options.inputLabel||"VALUE";
+ const placeholder=options.placeholder||"";
+ const okLabel=options.okLabel||(kind==="confirm"?"Confirm":kind==="prompt"?"Continue":"Got it");
+ const cancelLabel=options.cancelLabel||"Cancel";
+ const danger=!!options.danger;
+ const icon=options.icon||(danger?"⚠":"✦");
+ const backdrop=$("appDialogBackdrop"), panel=$("appDialogModal");
+ // Only one application dialog may be active. Resolve a previous one as cancelled.
+ if(activeAppDialogResolve){const previous=activeAppDialogResolve;activeAppDialogResolve=null;previous(null)}
+ return new Promise(resolve=>{
+  let done=false;
+  const finish=value=>{
+   if(done)return;done=true;
+   backdrop.classList.remove("open");
+   activeAppDialogResolve=null;
+   panel.onkeydown=null;
+   resolve(value);
+  };
+  activeAppDialogResolve=finish;
+  const promptField=kind==="prompt"?`<div class="app-dialog-field"><label for="appDialogInput">${esc(inputLabel)}</label><input id="appDialogInput" value="${escAttr(defaultValue)}" placeholder="${escAttr(placeholder)}" autocomplete="off" spellcheck="false"></div>`:"";
+  const cancelButton=kind==="alert"?"":`<button id="appDialogCancel">${esc(cancelLabel)}</button>`;
+  panel.innerHTML=`<div class="app-dialog-head"><div class="app-dialog-mark">${esc(icon)}</div><div><h2 class="app-dialog-title" id="appDialogTitle">${esc(title)}</h2><p class="app-dialog-message">${esc(message).replace(/\n/g,"<br>")}</p></div><button class="app-dialog-close" id="appDialogX" aria-label="Close">×</button></div>${promptField}<div class="app-dialog-actions">${cancelButton}<button id="appDialogOk" class="${danger?"danger":"primary"}">${esc(okLabel)}</button></div><div class="app-dialog-hint">CatCB™ <span style="opacity:.7">·</span> Made by Bejlint 💚</div>`;
+  backdrop.classList.add("open");
+  const cancel=()=>finish(kind==="prompt"?null:kind==="confirm"?false:undefined);
+  const submit=()=>{
+   if(kind==="prompt"){const field=$("appDialogInput");finish(field?field.value:null)}
+   else if(kind==="confirm")finish(true);
+   else finish(undefined);
+  };
+  $("appDialogOk").onclick=submit;
+  const cancelEl=$("appDialogCancel");if(cancelEl)cancelEl.onclick=cancel;
+  $("appDialogX").onclick=cancel;
+  backdrop.onclick=e=>{if(e.target===backdrop)cancel()};
+  panel.onkeydown=e=>{
+   if(e.key==="Escape"){e.preventDefault();e.stopPropagation();cancel();return}
+   if(e.key==="Enter"&&kind==="prompt"&&e.target.tagName!=="TEXTAREA"){
+    e.preventDefault();e.stopPropagation();submit();
+   }
+  };
+  const field=$("appDialogInput");
+  if(field){field.focus();field.select()}else $("appDialogOk").focus();
+ });
+}
+function catPrompt(title,message,value="",options={}){
+ return appDialog({kind:"prompt",title,message,value,inputLabel:options.inputLabel||"NAME",placeholder:options.placeholder||"Enter a value",okLabel:options.okLabel||"Save",icon:options.icon||"✎"});
+}
+function catConfirm(title,message,options={}){
+ return appDialog({kind:"confirm",title,message,okLabel:options.okLabel||"Confirm",cancelLabel:options.cancelLabel||"Cancel",danger:!!options.danger,icon:options.icon||(options.danger?"⚠":"✦")});
+}
+function catAlert(title,message,options={}){
+ return appDialog({kind:"alert",title,message,okLabel:options.okLabel||"Got it",icon:options.icon||"✦"});
+}
+
+function setUpdateStatus(message,kind="info"){
+ const el=$("updateStatus");if(!el)return;
+ el.className="update-status"+(kind==="good"?" good":kind==="bad"?" bad":"");
+ const symbol=kind==="good"?"✓":kind==="bad"?"⚠":"ⓘ";
+ el.innerHTML=`<span class="status-symbol">${symbol}</span><div>${esc(message).replace(/\n/g,"<br>")}</div>`;
+}
+function formatUpdateSize(n){if(n<1024)return n+" B";if(n<1048576)return (n/1024).toFixed(0)+" KB";return (n/1048576).toFixed(1)+" MB"}
+async function loadAppInfo(){
+ try{
+  const res=await fetch("/api/app-info",{cache:"no-store"});const info=await res.json();if(!res.ok)throw Error(info.error||"Unable to read application details");
+  const version=info.app_version||UI_APP_VERSION;
+  document.querySelectorAll("[data-app-version]").forEach(el=>el.textContent="v"+version);
+  document.querySelectorAll("[data-about-version]").forEach(el=>el.textContent="Version "+version);
+  document.querySelectorAll("[data-latest-version]").forEach(el=>el.textContent="Latest: v"+version);
+  if($("updateCurrentVersion"))$("updateCurrentVersion").textContent="v"+version;
+  if($("updateCurrentPath"))$("updateCurrentPath").textContent=info.application_file||"Path unavailable";
+  if($("updateInstallMode")){
+   $("updateInstallMode").textContent=info.is_frozen?"Packaged EXE":"Source / Python mode";
+   $("updateInstallMode").style.color=info.is_frozen?"var(--accent)":"var(--muted)";
+  }
+  if($("updatePackageMode")&&!verifiedUpdate)$("updatePackageMode").textContent=info.is_frozen?"Replace & restart":"Inspect only — launch the EXE to install";
+ }catch(e){
+  document.querySelectorAll("[data-app-version]").forEach(el=>el.textContent="v"+UI_APP_VERSION);
+  if($("updateCurrentVersion"))$("updateCurrentVersion").textContent="v"+UI_APP_VERSION;
+  if($("updateInstallMode"))$("updateInstallMode").textContent="App info unavailable";
+ }
+}
+function bindUpdateTab(){
+ if(!$("browseUpdateBtn"))return;
+ $("browseUpdateBtn").onclick=()=>$("updateFileInput").click();
+ $("updateFileInput").onchange=()=>{const file=$("updateFileInput").files?.[0];if(file)inspectUpdateFile(file)};
+ $("clearUpdateBtn").onclick=clearUpdateSelection;
+ $("installUpdateBtn").onclick=installVerifiedUpdate;
+ $("updateCopyCurrentPath").onclick=()=>copyText($("updateCurrentPath").textContent||"");
+ loadAppInfo();
+}
+function clearUpdateSelection(){
+ verifiedUpdate=null;updateSelectedFile=null;
+ if($("updateFileInput"))$("updateFileInput").value="";
+ if($("updateFileName"))$("updateFileName").textContent="No update package selected";
+ if($("updatePackageMeta"))$("updatePackageMeta").style.display="none";
+ if($("updateReleaseNotes"))$("updateReleaseNotes").style.display="none";
+ if($("updateInstallBtn"))$("updateInstallBtn").disabled=true;
+ if($("updateProgress"))$("updateProgress").classList.remove("active");
+ setUpdateStatus("Select a package to check its version, manifest and executable hash. Nothing changes until you confirm installation.");
+}
+async function inspectUpdateFile(file){
+ verifiedUpdate=null;updateSelectedFile=file;
+ $("installUpdateBtn").disabled=true;
+ $("updatePackageMeta").style.display="none";$("updateReleaseNotes").style.display="none";
+ $("updateFileName").textContent=file.name+" · "+formatUpdateSize(file.size);
+ if(!file.name.toLowerCase().endsWith(".zip")){setUpdateStatus("Choose a .zip update package generated by the CatCB builder, not a source ZIP or a plain EXE.","bad");return}
+ if(file.size>180*1024*1024){setUpdateStatus("The update package is larger than the 180 MB limit.","bad");return}
+ $("updateProgress").classList.add("active");setUpdateStatus("Reading and verifying the package…");
+ try{
+  const bytes=new Uint8Array(await file.arrayBuffer());let binary="";const chunk=0x8000;
+  for(let i=0;i<bytes.length;i+=chunk)binary+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunk,bytes.length)));
+  const payload={filename:file.name,content_base64:btoa(binary)};
+  const response=await fetch("/api/update/inspect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+  const result=await response.json();if(!response.ok)throw Error(result.error||"Package verification failed.");
+  verifiedUpdate=result;
+  $("updatePackageMeta").style.display="grid";
+  $("updatePackageVersion").textContent="v"+result.version;
+  $("updatePackageSize").textContent=formatUpdateSize(result.exe_size||0);
+  $("updatePackageHash").textContent=result.sha256_verified?"Verified ✓":"Not verified";
+  $("updatePackageMode").textContent=result.can_install?"Replace & restart":"Inspect only — use packaged EXE";
+  $("updateReleaseNotes").style.display="block";
+  $("updateReleaseNotes").textContent="Release notes\n"+(result.release_notes||"No release notes provided.");
+  if(result.can_install){
+   setUpdateStatus(`Package verified. CatCB v${result.current_version} can be updated to v${result.version}. Your current EXE will be backed up before replacement.`,"good");
+   $("installUpdateBtn").disabled=false;
+  }else{
+   setUpdateStatus(result.install_reason||"The package passed validation, but this running instance cannot install updates. Start the packaged CatCB.exe to install.","bad");
+   $("installUpdateBtn").disabled=true;
+  }
+ }catch(e){verifiedUpdate=null;setUpdateStatus(e.message||"Update verification failed.","bad")}
+ finally{$("updateProgress").classList.remove("active")}
+}
+async function installVerifiedUpdate(){
+ if(!verifiedUpdate?.token)return;
+ const approved=await catConfirm("Install CatCB update?",`Install CatCB v${verifiedUpdate.version} now? CatCB will close, back up the current EXE, replace it, and restart. Your personal snippets/config are stored separately and will not be overwritten.`,{okLabel:"Install & restart",cancelLabel:"Not now",icon:"↻"});
+ if(!approved)return;
+ const button=$("installUpdateBtn");button.disabled=true;button.textContent="Preparing update…";
+ try{
+  const res=await fetch("/api/update/apply",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:verifiedUpdate.token})});
+  const data=await res.json();if(!res.ok)throw Error(data.error||"Could not prepare update.");
+  await catAlert("Update prepared",`CatCB v${verifiedUpdate.version} is ready to install. This window will close, the old EXE will be backed up, and the new version will open automatically.`,{icon:"✓",okLabel:"Close CatCB & update"});
+  await fetch("/api/update/shutdown",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:verifiedUpdate.token})}).catch(()=>{});
+  setTimeout(()=>{try{window.close()}catch(e){}},300);
+ }catch(e){setUpdateStatus(e.message||"Could not start the update.","bad");button.disabled=false;button.textContent="Install update & restart"}
+}
+function openModal(){$("modalBackdrop").classList.add("open")}
+function closeModal(){$("modalBackdrop").classList.remove("open")}
+$("modalBackdrop").addEventListener("click",e=>{if(e.target===$("modalBackdrop"))closeModal()});
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),2500)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function escAttr(s){return esc(s)}
+function setFilter(filter,category="All categories"){state.filter=filter;state.category=category;renderNav();renderList()}
+function addCategoryQuick(){
+ $("modal").innerHTML=`<h2>Create category</h2><p>Make a category for your own snippets. Keep the sidebar tidy with only the categories you need.</p>
+ <div class="form-field"><label for="newCatName">CATEGORY NAME</label><input id="newCatName" placeholder="e.g. Azure, Linux, Monitoring"></div>
+ <div class="modal-actions"><span></span><div class="right"><button id="cancelModal">Cancel</button><button class="primary" id="saveCat">Create category</button></div></div>`;
+ openModal();$("cancelModal").onclick=closeModal;
+ $("saveCat").onclick=()=>{const name=$("newCatName").value.trim();if(!name){toast("Enter a category name");return}
+  if(allCategories().some(c=>c.toLowerCase()===name.toLowerCase())){toast("That category already exists");return}
+  state.categories.push(name);state.categoryIcons[name]=$("newCatIcon").value.trim()||"▣";state.filter="category";state.category=name;closeModal();persist();renderNav();renderList();toast("Category created")
+ };$("newCatName").focus();
+}
+function openSettings(tab="general"){
+ $("modal").innerHTML=`<h2>Settings</h2><p>Make CatCB yours. Changes are saved locally on this computer.</p>
+ <div class="settings-tabs">
+  <button data-tab="general" class="${tab==="general"?"active":""}">General</button>
+  <button data-tab="appearance" class="${tab==="appearance"?"active":""}">Appearance</button>
+  <button data-tab="categories" class="${tab==="categories"?"active":""}">Categories</button>
+  <button data-tab="data" class="${tab==="data"?"active":""}">Data & backups</button>
+  <button data-tab="paths" class="${tab==="paths"?"active":""}">Config & paths</button>
+  <button data-tab="update" class="${tab==="update"?"active":""}">Update</button>
+  <button data-tab="about" class="${tab==="about"?"active":""}">About</button>
+ </div>
+ <section class="settings-section ${tab==="general"?"active":""}" data-section="general">
+  <div class="setting-row"><div><h3>Keyboard shortcuts</h3><p>Ctrl+F search · Ctrl+N new snippet · Ctrl+E edit · Ctrl+Enter fill & copy · Ctrl+D favorite · Esc close/clear</p></div><div class="setting-control"><span class="muted">Built in</span></div></div>
+  <div class="setting-row"><div><h3>Starter examples</h3><p>CatCB starts with only three useful examples. Older untouched built-in examples are moved to Recycle Bin so you can restore them if needed.</p></div><div class="setting-control"><button id="cleanupExamples">View moved examples</button></div></div>
+  <div class="setting-row"><div><h3>Confirm before deleting</h3><p>Deleted snippets go to Recycle Bin first.</p></div><div class="setting-control"><span class="muted">Always on</span></div></div>
+ </section>
+ <section class="settings-section ${tab==="appearance"?"active":""}" data-section="appearance">
+  <div class="setting-row"><div><h3>Appearance</h3><p>CatCB uses the dark glass theme permanently for a consistent, readable workspace.</p></div><div class="setting-control"><span class="pill">Night mode</span></div></div>
+  <div class="setting-row"><div><h3>Space wallpaper</h3><p>Show the cat galaxy behind the panels or use a minimal backdrop.</p></div><div class="setting-control"><button id="settingWallpaper">${state.wallpaper?"Enabled":"Disabled"}</button></div></div>
+  <div class="setting-row"><div><h3>Wallpaper intensity</h3><p>Keep it subtle so text and cards stay readable.</p></div><div class="setting-control"><input id="wallpaperOpacity" type="range" min="15" max="78" step="1" value="${state.wallpaperOpacity}"><span id="opacityValue" style="font-size:11px;width:32px;text-align:right">${state.wallpaperOpacity}%</span></div></div>
+  <div class="setting-row"><div><h3>Animation</h3><p>Subtle transitions on cards, modals and buttons. Respects system layout; no distracting looping motion.</p></div><div class="setting-control"><span class="muted">Subtle</span></div></div>
+ </section>
+ <section class="settings-section ${tab==="categories"?"active":""}" data-section="categories">
+  <div class="setting-row"><div><h3>Your categories</h3><p>Create, rename or remove categories. If a category is removed, its snippets move to “Other”.</p></div><div class="setting-control"><button id="settingsAddCategory" class="primary">＋ Add</button></div></div>
+  <div id="categoryManager">${renderCategoryManager()}</div>
+ </section>
+ <section class="settings-section ${tab==="data"?"active":""}" data-section="data">
+  <div class="setting-row"><div><h3>Export backup</h3><p>Download your snippets, categories, favorites and deleted items as a JSON file.</p></div><div class="setting-control"><button id="exportData">Export JSON</button></div></div>
+  <div class="setting-row"><div><h3>Import backup</h3><p>Merge a CatCB JSON backup into this library. Existing snippets are kept.</p></div><div class="setting-control"><button id="pickImport">Choose file</button><input type="file" id="importFile" accept=".json,application/json" hidden></div></div>
+  <div class="setting-row"><div><h3>Recycle Bin</h3><p>${state.deleted.length} item(s) can be restored or permanently deleted from the Recycle Bin.</p></div><div class="setting-control"><button id="goTrash">Open bin</button></div></div>
+  <div class="setting-row"><div><h3>Reset application data</h3><p>Remove all snippets and categories on this computer and return to the three starter examples.</p></div><div class="setting-control"><button id="resetData" style="color:var(--danger)">Reset…</button></div></div>
+ </section>
+ <section class="settings-section ${tab==="paths"?"active":""}" data-section="paths">
+  <div class="setting-row"><div><h3>JSON configuration file</h3><p>Your snippets, categories, favorites, theme and layout settings are stored here.</p><code class="config-path" id="configPathText">Loading path…</code></div><div class="setting-control"><button id="copyConfigPath">Copy path</button><button id="openConfigFile">Open JSON</button></div></div>
+  <div class="setting-row"><div><h3>Configuration folder</h3><p>Open the folder that contains the JSON file.</p><code class="config-path" id="configFolderText">Loading path…</code></div><div class="setting-control"><button id="openConfigFolder">Open folder</button></div></div>
+  <div class="setting-row"><div><h3>Email draft folder</h3><p>Saved Outlook .msg drafts are written here.</p><code class="config-path" id="draftFolderText">Loading path…</code><div class="muted" style="font-size:10px;margin-top:6px">Requires Outlook Classic and permission to write in Documents.</div></div><div class="setting-control"><button id="openDraftFolder">Open folder</button></div></div>
+ </section>
+ <section class="settings-section ${tab==="update"?"active":""}" data-section="update">
+  <div class="update-hero"><div class="update-hero-icon">↻</div><div style="flex:1"><h3>CatCB Update Center</h3><p>Select a CatCB update package ZIP. CatCB checks its app identity, version and SHA-256 hash before offering to replace the running EXE. Your snippets and preferences stay in the separate JSON config file.</p></div></div>
+  <div class="update-card">
+   <h3>01 · CURRENT INSTALLATION</h3>
+   <div class="update-version-row"><div><div style="font-size:11px;color:var(--muted);margin-bottom:5px">Installed version</div><strong id="updateCurrentVersion">v1.10.2</strong></div><span class="pill" id="updateInstallMode">Checking install type…</span></div>
+   <div class="update-version-row"><div style="min-width:0;flex:1"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Application file</div><code id="updateCurrentPath" class="config-path">Checking path…</code></div><button id="updateCopyCurrentPath" class="tiny">Copy path</button></div>
+  </div>
+  <div class="update-card">
+   <h3>02 · SELECT AN UPDATE PACKAGE</h3>
+   <p class="muted" style="font-size:11px;line-height:1.6;margin:0 0 11px">Choose a <code>CatCB_Update_vX.Y.Z.zip</code> generated by the CatCB build script. The ZIP must contain <code>CatCB.exe</code> and <code>update_manifest.json</code>. A source-code ZIP or a plain EXE is not an update package.</p>
+   <div class="update-file-row"><button class="primary" id="browseUpdateBtn">Choose update ZIP…</button><input type="file" id="updateFileInput" accept=".zip,application/zip" hidden><span class="update-file-name" id="updateFileName">No update package selected</span></div>
+   <div class="update-progress" id="updateProgress"><span></span></div>
+   <div class="update-status" id="updateStatus"><span class="status-symbol">ⓘ</span><div>Select a package to check its version, manifest and executable hash. Nothing changes until you confirm installation.</div></div>
+   <div class="update-file-meta" id="updatePackageMeta" style="display:none">
+    <div class="update-meta-cell"><label>PACKAGE VERSION</label><strong id="updatePackageVersion">—</strong></div>
+    <div class="update-meta-cell"><label>PACKAGE SIZE</label><strong id="updatePackageSize">—</strong></div>
+    <div class="update-meta-cell"><label>SHA-256 CHECK</label><strong id="updatePackageHash">—</strong></div>
+    <div class="update-meta-cell"><label>INSTALL METHOD</label><strong id="updatePackageMode">—</strong></div>
+   </div>
+   <div class="update-notes" id="updateReleaseNotes" style="display:none"></div>
+   <div class="update-actions"><button id="clearUpdateBtn">Clear</button><button id="installUpdateBtn" class="primary" disabled>Install update &amp; restart</button></div>
+  </div>
+  <div class="update-note">The updater keeps a backup of the current EXE before replacing it. SHA-256 detects package corruption, but it does not prove publisher identity if both the ZIP and its manifest have been tampered with; only install updates from a trusted source. Installation needs a packaged EXE and a writable install folder. The first move from a version without this tab still requires the usual build-and-replace process.</div>
+ </section>
+ <section class="settings-section ${tab==="about"?"active":""}" data-section="about">
+  <div class="about-hero">
+   <img src="/CatCB_Mascot_v14.png" alt="CatCB mascot">
+   <div style="flex:1;min-width:0"><div class="about-kicker">PERSONAL IT PRODUCTIVITY TOOL</div><h3>CatCB™ <span class="pill" data-about-version>Version 1.10.2</span></h3><p>Made by Bejlint 💚 · Your tiny IT sidekick 🐱</p></div>
+  </div>
+  <div class="about-grid">
+   <div class="about-card">
+    <div class="about-kicker">WHAT IS CATCB?</div>
+    <h3>Your reusable IT workspace</h3>
+    <p>CatCB is a lightweight personal IT productivity tool for saving and reusing the messages, commands, incident updates, handover notes and email templates you use at work. Instead of rewriting the same text, keep it in one searchable library, fill in the details, and copy or open a prepared Outlook draft. Your library and preferences are stored locally on your Windows user profile.</p>
+   </div>
+   <div class="about-card">
+    <div class="about-kicker">HOW TO USE IT</div>
+    <h3>Get started in a few steps</h3>
+    <ul>
+     <li><span class="step">1</span><span><b>Find a template.</b> Search or choose a category in the left sidebar.</span></li>
+     <li><span class="step">2</span><span><b>Make it yours.</b> Use Add or Edit; changes are autosaved. Variables such as <code>{{INC}}</code>, <code>{{TEAM}}</code> and <code>{{HOSTNAME}}</code> can be filled before copying.</span></li>
+     <li><span class="step">3</span><span><b>Copy and reuse.</b> Fill in the variable fields, then choose Copy filled text. Right-click a snippet for quick actions.</span></li>
+     <li><span class="step">4</span><span><b>Prepare an email.</b> Use an E-mails template or Report Email Studio to set To/CC/BCC, sender, subject, body and report attachments, then open an Outlook draft or save a <code>.msg</code> file.</span></li>
+     <li><span class="step">5</span><span><b>Personalize and back up.</b> Right-click categories to rename, change icons or remove them. Use Settings → Data & backups to export or import your library.</span></li>
+    </ul>
+   </div>
+  </div>
+  <div class="about-history">
+   <div class="about-history-head"><h3>↻ Update history</h3><span class="pill" data-latest-version>Latest: v1.10.2</span></div>
+   <div class="about-history-list">
+    <div class="history-entry"><div class="history-version">v1.10.2 · Current</div><div><h4>Native CatCB window &amp; update fix</h4><p>Runs in its own CatCB-branded window instead of a Chrome app window, improves high-DPI layout, clears multi-selection when clicking outside the snippet list, removes the outdated “NEW” badge, and replaces the CMD/findstr updater with a hidden VBScript updater that has bounded waiting and logging.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.10.1</div><div><h4>Multi-select layout &amp; update reliability</h4><p>Introduced multi-select layout repairs and the first bounded update helper. This release improves the layout for narrow/high-DPI windows and replaces the visible CMD-based updater.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.10.0</div><div><h4>Multi-select & clipboard actions</h4><p>Select multiple snippets with checkboxes, Ctrl-click or Shift-click. Copy, cut, paste, duplicate and move batches between categories; Delete moves all selected snippets to Recycle Bin. The Update Center stays compatible with generated update ZIP packages.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.9.0</div><div><h4>Update Center & version consistency</h4><p>Added a local update-file installer with package validation, SHA-256 checking, backup and restart flow. Unified version labels and automatic update-package generation.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.8</div><div><h4>About & onboarding</h4><p>Added an in-app guide, version history, creator-support note and clearer first-use instructions.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.7</div><div><h4>Branded popups</h4><p>Replaced browser-native prompt, confirm and alert dialogs with CatCB-styled windows.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.6</div><div><h4>Right-click productivity</h4><p>Added contextual actions for snippets and categories, custom category icons, and improved autosave handling.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.5</div><div><h4>Night mode & editing</h4><p>Focused the interface on dark mode and added autosave plus undo/redo controls for text editing.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.4</div><div><h4>Report & Outlook Studio</h4><p>Added reusable email metadata, Outlook draft creation, <code>.msg</code> export, report attachments and configuration-path settings.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.3</div><div><h4>Email templates</h4><p>Introduced saved Outlook template fields for recipients, sender and subject.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.2</div><div><h4>Clean modern interface</h4><p>Introduced the glass-style design, editable snippets, category management and adjustable background.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.1</div><div><h4>Snippet manager</h4><p>Expanded the original clipboard idea with search, favorites, categories and reusable variables.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.0</div><div><h4>The first CatCB</h4><p>A simple library for reusable IT messages, commands and handover notes.</p></div></div>
+   </div>
+  </div>
+  <div class="about-support">
+   <div class="about-support-icon">💚</div>
+   <div style="flex:1"><h3>Support the creator</h3><p>You can support me by buying me a Vapsolo Sixer. 💚 No pressure — thank you for using CatCB and helping this little project grow!</p></div>
+  </div>
+  <div class="about-footer"><span>CatCB™ · Created by Bejlint</span><span class="about-local-pill">Local-first · No automatic email sending</span></div>
+ </section>
+ <div class="modal-actions"><span class="muted" style="font-size:10px">CatCB™ · Made by Bejlint ♥</span><div class="right"><button id="closeSettings">Done</button></div></div>`;
+ openModal();
+ $("modal").querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>openSettings(b.dataset.tab));
+ $("closeSettings").onclick=closeModal;
+ $("cleanupExamples").onclick=()=>{state.filter="trash";closeModal();renderNav();renderList();toast("Moved starter examples are available in Recycle Bin")};
+ $("settingWallpaper").onclick=()=>{state.wallpaper=!state.wallpaper;applyPrefs();persist();openSettings("appearance")};
+ $("wallpaperOpacity").oninput=e=>{state.wallpaperOpacity=Number(e.target.value);applyPrefs();$("opacityValue").textContent=state.wallpaperOpacity+"%";persist()};
+ $("settingsAddCategory").onclick=()=>{closeModal();addCategoryQuick()};
+ $("categoryManager").querySelectorAll("[data-rename-cat]").forEach(b=>b.onclick=()=>renameCategory(decodeURIComponent(b.dataset.renameCat)));
+ $("categoryManager").querySelectorAll("[data-delete-cat]").forEach(b=>b.onclick=()=>deleteCategory(decodeURIComponent(b.dataset.deleteCat)));
+ $("categoryManager").querySelectorAll("[data-icon-cat]").forEach(b=>b.onclick=()=>changeCategoryIcon(decodeURIComponent(b.dataset.iconCat)));
+ $("exportData").onclick=exportBackup;
+ $("pickImport").onclick=()=>$("importFile").click();
+ $("importFile").onchange=importBackup;
+ $("goTrash").onclick=()=>{state.filter="trash";closeModal();renderNav();renderList()};
+ $("resetData").onclick=resetData;
+ if(tab==="paths")loadConfigPaths();
+ if(tab==="update"){loadAppInfo();bindUpdateTab();}
+}
+function renderCategoryManager(){
+ const cats=allCategories();
+ if(!cats.length)return '<div class="empty">No categories yet. Add one above or create it when saving a snippet.</div>';
+ return cats.map(c=>`<div class="category-manage" data-category-row="${escAttr(c)}"><div class="cat-label"><span class="cat-emoji">${esc(catIcon(c))}</span><span>${esc(c)} <span class="muted">· ${state.snippets.filter(s=>s.category===c).length}</span></span></div><button class="tiny category-icon-edit" title="Change icon" data-icon-cat="${encodeURIComponent(c)}">${esc(catIcon(c))}</button><button class="tiny" data-rename-cat="${encodeURIComponent(c)}">Rename</button><button class="tiny" data-delete-cat="${encodeURIComponent(c)}">Remove</button></div>`).join("");
+}
+async function renameCategory(oldName){
+ const settingsWasOpen=$("modalBackdrop").classList.contains("open");
+ const newName=await catPrompt("Rename category",`Choose a new name for “${oldName}”.`,oldName,{inputLabel:"CATEGORY NAME",placeholder:"Category name",okLabel:"Rename",icon:"✎"});
+ if(newName===null)return;
+ const name=newName.trim();if(!name){toast("Category name can't be empty");return}
+ if(name.toLowerCase()!==oldName.toLowerCase()&&allCategories().some(c=>c.toLowerCase()===name.toLowerCase())){await catAlert("Category already exists",`A category named “${name}” already exists. Choose another name.`,{icon:"⚠"});return}
+ state.snippets.forEach(s=>{if(s.category===oldName)s.category=name});
+ state.deleted.forEach(s=>{if(s.category===oldName)s.category=name});
+ state.categories=state.categories.map(c=>c===oldName?name:c);if(!state.categories.includes(name))state.categories.push(name);
+ if(state.categoryIcons[oldName]){state.categoryIcons[name]=state.categoryIcons[oldName];delete state.categoryIcons[oldName]}
+ if(state.filter==="category"&&state.category===oldName)state.category=name;
+ persist();renderNav();renderList();if(settingsWasOpen)openSettings("categories");toast("Category renamed");
+}
+async function changeCategoryIcon(name){
+ const settingsWasOpen=$("modalBackdrop").classList.contains("open");
+ const current=catIcon(name);
+ const value=await catPrompt("Customize category icon",`Choose an emoji or symbol for “${name}”.`,current,{inputLabel:"EMOJI OR SYMBOL",placeholder:"e.g. 🐱, ☁, ⚙",okLabel:"Save icon",icon:current});
+ if(value===null)return;
+ const icon=value.trim();
+ if(!icon){toast("Icon can't be empty");return}
+ state.categoryIcons[name]=icon.slice(0,8);
+ persist();renderNav();renderList();
+ if(settingsWasOpen)openSettings("categories");
+ toast("Category icon updated");
+}
+async function deleteCategory(name){
+ const settingsWasOpen=$("modalBackdrop").classList.contains("open");
+ if(!(await catConfirm("Delete category?",`Remove “${name}”? Its snippets will be moved to “Other”; no snippets will be deleted.`,{okLabel:"Delete category",danger:true,icon:"⌫"})))return;
+ state.snippets.forEach(s=>{if(s.category===name)s.category="Other"});
+ state.deleted.forEach(s=>{if(s.category===name)s.category="Other"});
+ state.categories=state.categories.filter(c=>c!==name);delete state.categoryIcons[name];
+ if(state.filter==="category"&&state.category===name){state.filter="all";state.category="All categories"}
+ persist();renderNav();renderList();if(settingsWasOpen)openSettings("categories");toast("Category removed");
+}
+function exportBackup(){
+ const data={version:"1.10.2",snippets:state.snippets,deleted:state.deleted,categories:allCategories(),categoryIcons:state.categoryIcons,theme:"dark",wallpaper:state.wallpaper,wallpaperOpacity:state.wallpaperOpacity};
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CatCB_backup.json";a.click();URL.revokeObjectURL(a.href);toast("Backup exported");
+}
+async function importBackup(){
+ const file=$("importFile").files[0];if(!file){toast("Choose a backup file first");return}
+ try{
+  const data=JSON.parse(await file.text());if(!Array.isArray(data.snippets))throw Error("invalid");
+  const existing=new Set(state.snippets.map(s=>s.title+"|"+s.category+"|"+s.content));let added=0;
+  data.snippets.forEach(s=>{if(s.title&&s.content&&!existing.has(s.title+"|"+s.category+"|"+s.content)){state.snippets.push({...s,id:uid(),favorite:!!s.favorite});added++}});
+  state.categories=[...new Set([...state.categories,...(data.categories||[]),...data.snippets.map(s=>s.category).filter(Boolean)])];state.categoryIcons={...state.categoryIcons,...(data.categoryIcons||{})};
+  state.deleted.push(...(Array.isArray(data.deleted)?data.deleted.map(s=>({...s,id:uid()})):[]));
+  persist();renderNav();renderList();openSettings("data");toast(`Imported ${added} snippet(s)`);
+ }catch(e){toast("That backup file isn't valid CatCB JSON")}
+}
+async function resetData(){
+ if(!(await catConfirm("Reset CatCB data?","This will clear all snippets, categories and the Recycle Bin for this Windows user. Export a backup first if you need it. This cannot be undone.",{okLabel:"Reset everything",danger:true,icon:"⚠"})))return;
+ state.snippets=defaults.map(x=>({...x,id:uid()}));state.deleted=[];state.categories=[];state.categoryIcons={};state.filter="all";state.category="All categories";state.selectedId=null;state.migration={compactStarterSetV12:true};
+ persist();renderNav();renderList();openSettings("general");toast("CatCB reset to starter examples");
+}
+function showMore(){
+ const s=selected();if(!s)return;
+ $("modal").innerHTML=`<h2>Snippet actions</h2><p>${esc(s.title)}</p>
+ <div class="setting-row"><div><h3>Duplicate snippet</h3><p>Create a separate editable copy.</p></div><div class="setting-control"><button id="duplicate" class="primary">Duplicate</button></div></div>
+ <div class="setting-row"><div><h3>Copy original template</h3><p>Copy text exactly, including variables.</p></div><div class="setting-control"><button id="raw">Copy template</button></div></div>
+ <div class="setting-row"><div><h3>Move to Recycle Bin</h3><p>You can restore it later.</p></div><div class="setting-control"><button id="moreDelete" style="color:var(--danger)">Move to bin</button></div></div>
+ <div class="modal-actions"><span></span><div class="right"><button id="closeMore" class="primary">Done</button></div></div>`;
+ openModal();$("closeMore").onclick=closeModal;
+ $("raw").onclick=()=>{copyRaw();closeModal()};
+ $("duplicate").onclick=()=>{const copy={...s,id:uid(),title:s.title+" (copy)",favorite:false};state.snippets.push(copy);state.selectedId=copy.id;persist();renderNav();renderList();closeModal();toast("Snippet duplicated")};
+ $("moreDelete").onclick=()=>{closeModal();deleteSelected()};
+}
+function addCategoryQuick(){
+ $("modal").innerHTML=`<h2>Create category</h2><p>Use categories to organize the snippets you actually need. Pick an emoji or symbol to make it yours.</p>
+ <div class="form-grid"><div class="form-field"><label for="newCatName">CATEGORY NAME</label><input id="newCatName" placeholder="e.g. Azure, Linux, Monitoring"></div>
+ <div class="form-field"><label for="newCatIcon">CATEGORY ICON</label><input id="newCatIcon" maxlength="8" value="✦" placeholder="e.g. 🐱, ☁, ⚙"></div></div>
+ <div class="modal-actions"><span class="muted" style="font-size:10px">Tip: emojis work too.</span><div class="right"><button id="cancelModal">Cancel</button><button class="primary" id="saveCat">Create category</button></div></div>`;
+ openModal();$("cancelModal").onclick=closeModal;
+ $("saveCat").onclick=()=>{const name=$("newCatName").value.trim();if(!name){toast("Enter a category name");return}
+  if(allCategories().some(c=>c.toLowerCase()===name.toLowerCase())){toast("That category already exists");return}
+  state.categories.push(name);state.categoryIcons[name]=$("newCatIcon").value.trim()||"▣";state.filter="category";state.category=name;closeModal();persist();renderNav();renderList();toast("Category created")
+ };$("newCatName").focus();
+}
+function closeModal(){ $("modalBackdrop").classList.remove("open") }
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),2450)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function escAttr(s){return esc(s)}
+$("modalBackdrop").addEventListener("click",e=>{if(e.target===$("modalBackdrop"))closeModal()});
+init();
+setInterval(()=>fetch("/api/ping",{cache:"no-store"}).catch(()=>{}),8000);
+</script>
+</body>
+</html>

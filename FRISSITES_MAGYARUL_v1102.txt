@@ -1,0 +1,37 @@
+CatCB v1.10.2 — magyar telepítési útmutató
+=========================================
+
+FONTOS: EGYSZERI KÉZI CSERE
+A jelenlegi v1.10.1 frissítője az a komponens, amely a látható CMD/findstr ablakot nyitja. A régi frissítő nem tudja saját magát megbízhatóan kijavítani, ezért az első v1.10.2-re váltást kézzel végezd el. A v1.10.1 Settings > Update fülén most ne telepítsd ezt a csomagot.
+
+1. Töltsd le a teljes CatCB_v1.10.2_Native_Window_Selection_Update_Fix.zip csomagot, és csomagold ki egy új mappába.
+2. Futtasd a BUILD_TEST_EXE.bat fájlt, majd várd meg a sikeres befejezést.
+3. A build elkészíti:
+   dist\CatCB.exe
+   dist\CatCB_Update_v1.10.2.zip
+4. Zárd be teljesen a CatCB-t és a régi CMD/Terminal ablakot.
+5. Készíts másolatot a most használt CatCB.exe-ről biztonsági mentésként.
+6. Másold az új dist\CatCB.exe fájlt a jelenlegi CatCB.exe helyére, felülírva a régi EXE-t. Ha nem tudod a régi EXE helyét: indítsd el a jelenlegi programot, nyisd meg a Settings > Update oldalt, és nézd meg az Application path értékét. A csere előtt zárd be az appot.
+7. Indítsd el az új CatCB.exe-t ugyanarról az útvonalról. A meglévő sablonok a %APPDATA%\CatCB\state.json fájlban maradnak.
+8. Ha korábban a Chrome-hoz tartozó ikont tűzted ki a tálcára, vedd le a régi rögzítést. Indítsd el az új CatCB.exe-t, majd a CatCB saját tálcaikonjára jobb gombbal kattintva rögzítsd a CatCB-t.
+
+MI JAVULT?
+- Saját CatCB-ablak, nem Chrome app-ablak; így a tálcán is a CatCB programnak kell megjelennie.
+- Normál maximalizált ablak: címsor marad, Windows-tálca látható.
+- Javított, kisebb ablakhoz/nagy DPI-hoz igazodó többes kijelöléses lista.
+- Induláskor nincs előre bepipált batch-kijelölés; a részletek panel ettől még mutathatja az első sablont.
+- A listán kívüli üres területre kattintás vagy navigációváltás törli a többes kijelölést.
+- A Report Email Studio gombból eltűnt a NEW címke.
+- Az új frissítő segédfolyamat rejtve fut, nem indít CMD/findstr hurkot, és naplózza a folyamatot.
+
+KÉSŐBBI FRISSÍTÉS
+Miután egyszer már v1.10.2 fut a gépeden, a következő, a buildelővel készített CatCB_Update_vX.Y.Z.zip fájlt a Settings > Update fülön tudod betallózni. A v1.10.2 új frissítője rejtett VBScript segédet használ, WMI-vel figyeli a CatCB folyamatot, időkorlátot és biztonsági másolatot használ.
+
+KÖVETELMÉNYEK
+A saját ablak a pywebview WebView2 motorját használja. Ha a program WebView2 hibát jelez, kérd az IT-t, hogy telepítse/engedélyezze a Microsoft Edge WebView2 Runtime-ot. A program szándékosan nem nyit Chrome-ot tartalék megoldásként.
+
+HIBA ESETÉN
+- Buildnapló: CatCB_build.log a forrásmappában.
+- Alkalmazásnapló: %APPDATA%\CatCB\catcb.log
+- Frissítési napló: %APPDATA%\CatCB\update.log
+- Korábbi EXE biztonsági mentései: %APPDATA%\CatCB\Backups

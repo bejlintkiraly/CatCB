@@ -1,0 +1,8 @@
+{
+  "app_id": "CatCB",
+  "version": "1.10.2",
+  "executable": "CatCB.exe",
+  "sha256": "REPLACE_WITH_SHA256_OF_BUILT_EXE",
+  "download_url": "https://example.invalid/releases/CatCB_Update_v1.10.2.zip",
+  "release_notes": "Sanitized baseline: native window, multi-select layout and update helper fixes."
+}

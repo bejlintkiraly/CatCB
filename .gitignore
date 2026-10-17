@@ -1,0 +1,39 @@
+# Build output
+build/
+dist/
+*.spec.bak
+*.pyc
+__pycache__/
+
+# CatCB executable and packaging output
+CatCB.exe
+CatCB_Test.exe
+CatCB_Update_*.zip
+
+# Local configuration, data, logs, caches and backups
+state.json
+catcb.log
+update.log
+CatCB_build.log
+*.log
+Backups/
+TempAttachments/
+UpdateStaging/
+FullscreenBrowserProfile/
+
+# Local user/content exports
+CatCB_backup*.json
+*.msg
+EmailDrafts/
+*.xlsx
+*.xlsm
+*.pptx
+*.docx
+*.pdf
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini

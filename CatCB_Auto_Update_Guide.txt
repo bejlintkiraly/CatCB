@@ -1,0 +1,28 @@
+CatCB Update Center — user guide
+================================
+
+The Update tab installs a locally selected update package. It does not connect to a server or download anything in the background.
+
+HOW A PACKAGE IS MADE
+1. The build script creates CatCB.exe.
+2. It calculates SHA-256 for that exact executable.
+3. It packages CatCB.exe and update_manifest.json in dist\CatCB_Update_vX.Y.Z.zip.
+4. The manifest records app_id=CatCB, version, hash, and release notes.
+
+HOW TO APPLY IT
+- Run CatCB from its compiled EXE.
+- Settings > Update > Choose update ZIP…
+- Select the package created by the newer build script.
+- CatCB verifies the manifest, app ID, newer version and SHA-256 hash.
+- If valid, choose Install update & restart. The current EXE is backed up, replaced and relaunched.
+- User data stays separate in %APPDATA%\CatCB\state.json.
+
+FIRST MIGRATION
+An older CatCB version without the Update tab can't install a package from within the app. Build and launch version 1.9.0 manually once. Subsequent versions can be installed through the Update tab.
+
+SAFETY
+- Use only update packages from a source you trust.
+- SHA-256 protects against accidental corruption but does not authenticate the publisher if both package and manifest are maliciously changed.
+- For team-wide distribution, use an approved HTTPS/company location and consider Authenticode signing.
+- Updates require a writable EXE folder; no admin elevation is attempted.
+- If the update doesn't relaunch, inspect %APPDATA%\CatCB\update.log and restore the backup in %APPDATA%\CatCB\Backups.
