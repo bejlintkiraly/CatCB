@@ -1,4 +1,4 @@
-CatCB v1.10.2 — magyar telepítési útmutató
+CatCB v1.10.13 — magyar telepítési útmutató
 =========================================
 
 FONTOS: EGYSZERI KÉZI CSERE
