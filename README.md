@@ -1,71 +1,92 @@
-# 🐱 CatCB
+# CatCB
 
-**A little tool that makes everyday work easier.**
+*A little tool that makes everyday work easier.*
 
-CatCB is a small Windows application I built to make my everyday work a little easier. It started with a simple idea: keep frequently used text snippets in one place and make them quick and easy to use.
+```text
+          /\_/\
+         ( o.o )
+          > ^ <
+```
 
-Over time, it grew into something more than that. I added features, adjusted the interface to suit the way I like to work, and turned it into a personal productivity tool that I now want to share with others.
+Hi, and welcome to CatCB!
 
-It's built around a simple idea: less time repeating the same tasks, more time getting things done.
+CatCB started as a small personal project. I wanted a simple place to keep the text snippets I use regularly, without having to search through old notes or type the same things again and again.
 
-## ✨ What can CatCB do?
+As I kept working on it, I added more features, changed the interface, fixed things that annoyed me, and slowly turned it into a tool that fits the way I like to work.
 
-- **Manage text snippets** — keep frequently used text organized into custom categories.
-- **Work with multiple snippets** — select, copy, move, and delete several items at once.
-- **Stay organized** — use custom categories and icons to make content easier to find.
-- **Undo and redo** — recover from changes while working with your snippets.
-- **Prepare emails and reports** — use the built-in Report & Outlook Studio tools to put content together more easily.
-- **Work with Outlook messages** — prepare drafts and save messages as `.msg` files, including attachments where supported.
-- **Make it your own** — personalize parts of the interface to suit your preferences.
-- **Keep your work saved** — your application data is stored locally in your Windows user profile.
+Now I'm sharing it here in case it can make someone else's day a little easier, too.
 
-CatCB is a personal project, so features and the interface may evolve as I continue improving it.
+And yes, there's a cat. There was never really any question about that.
 
-## 📥 Download
+## What can it do?
+
+CatCB is a Windows productivity tool for keeping reusable text organized and making everyday tasks a little less repetitive.
+
+Here's what it offers:
+
+- **Text snippets:** Save frequently used text in your own categories.
+- **Multiple selection:** Select and manage several snippets at once.
+- **Clipboard shortcuts:** Copy, cut, paste, and delete snippets more efficiently.
+- **Undo and redo:** Make changes without worrying about every little mistake.
+- **Custom organization:** Use categories and icons to keep things easy to find.
+- **Report & Outlook Studio:** Prepare report content and email text in one place.
+- **Outlook integration:** Prepare messages and save them as `.msg` files, including attachments where supported.
+- **Personalization:** Adjust parts of the interface to suit your preferences.
+- **Local storage:** Keep your snippets and settings on your own Windows profile.
+
+The idea isn't to replace every tool you already use. It's simply to make the repetitive parts of your day a little easier.
+
+## Download CatCB
 
 The easiest way to get started is to download the latest compiled Windows version.
 
-**[➡️ Download CatCB from GitHub Releases](https://github.com/bejlintkiraly/CatCB/releases/latest)**
+**[Get CatCB from GitHub Releases](https://github.com/bejlintkiraly/CatCB/releases/latest)**
 
 1. Open the Releases page.
 2. Download `CatCB.exe` from the latest release.
-3. Save it somewhere convenient on your Windows PC.
+3. Save it somewhere convenient on your PC.
 4. Run the application.
 
-You don't need to build the application from source just to use the prebuilt release.
+You don't need to install Python or build anything from source when using the prebuilt release.
 
 ### A note about Windows SmartScreen
 
-Since CatCB is an independently published application and its executable may not have a trusted digital signature or an established download reputation, Windows SmartScreen may display a warning when you launch it.
+Windows may display a SmartScreen warning when you launch CatCB. This can happen with independently published applications that don't yet have an established reputation or a trusted digital signature.
 
-This warning does not automatically mean the application is malicious, but it should not be ignored either.
+The warning alone doesn't mean the application is malicious, but it also shouldn't be treated as proof that a file is safe.
 
-Make sure you downloaded the executable from the official CatCB GitHub Releases page. If Windows displays a warning and you are not comfortable proceeding, cancel the launch. Only choose to continue if you have verified the source and are satisfied that you trust the file.
+For your own peace of mind, download CatCB only from the official GitHub Releases page. If you're unsure about a file or don't trust its source, don't run it.
 
-## 🖥️ Requirements
+## What do I need?
+
+For normal use:
 
 - A Windows PC.
-- The prebuilt release for normal use.
-- Microsoft Outlook Classic, installed and configured, for features that rely on its desktop integration.
+- The downloaded CatCB executable.
 
-Some features may depend on your local Windows and Outlook configuration.
+Some features, particularly Outlook-related functionality, require Microsoft Outlook Classic to be installed and configured on your computer.
 
-## 🛠️ Building from source
+The exact availability of certain features may depend on your Windows and Outlook setup.
 
-Want to build CatCB yourself? Here's the general process.
+## Want to build it yourself?
 
-1. Make sure Python is installed on your Windows PC and available to the build script.
-2. Open the [CatCB repository](https://github.com/bejlintkiraly/CatCB).
-3. Download the source code and extract the archive to a folder.
-4. Open the extracted folder.
-5. Run `BUILD_TEST_EXE.bat`.
-6. When the build completes successfully, look for the generated executable in the `dist` folder.
+The source code is available in this repository for people who want to inspect how the project is put together.
 
-The exact build output depends on the script and the environment. If the build fails, check the error message and make sure the required Python components are available.
+The project includes a Windows build script, `BUILD_TEST_EXE.bat`.
 
-The project is intended to be buildable in a regular Windows user environment, although corporate restrictions or local security policies may affect the process.
+The general process is:
 
-## 💾 Where is my data stored?
+1. Install Python and make sure the required components for the build are available.
+2. Download the source code from this repository.
+3. Extract the files into a folder.
+4. Open that folder and run `BUILD_TEST_EXE.bat`.
+5. If the build completes successfully, look for `CatCB.exe` inside the `dist` folder.
+
+The exact requirements depend on the current build script and your local environment. If something doesn't work, check the error output first.
+
+For everyday use, downloading the prebuilt release is the simpler option.
+
+## Where is my data stored?
 
 CatCB stores its application data locally under your Windows user profile:
 
@@ -73,46 +94,54 @@ CatCB stores its application data locally under your Windows user profile:
 %APPDATA%\CatCB\state.json
 ```
 
-This allows your saved data to remain separate from the executable, so replacing the application with a newer release does not normally mean starting from scratch.
+Keeping the data separate from the executable means that replacing CatCB with a newer version normally doesn't require you to start from scratch.
 
-**A quick tip:** back up your CatCB data before making major changes or experimenting with a new build. Your saved snippets and settings may be important to you.
+Still, it's a good idea to keep a backup of this file before trying a new build or making major changes.
 
-Also, remember that anything you save in your snippets may contain personal or sensitive information. Don't share your configuration file publicly without checking its contents first.
+One small but important reminder: if you store sensitive information in your snippets, check your saved data before sharing it with anyone.
 
-## 🔄 Updates
+Your snippets are yours. Even the ones with suspiciously many cat references.
 
-Check the [GitHub Releases page](https://github.com/bejlintkiraly/CatCB/releases) for new versions and their changelogs.
+## Updates
 
-Before updating, it's a good idea to close CatCB and keep a backup of your saved data. Only download releases from the official repository.
+New versions and their changes are published on the GitHub Releases page.
 
-## 💬 Feedback and suggestions
+**[View CatCB releases](https://github.com/bejlintkiraly/CatCB/releases)**
 
-CatCB started as a tool for my own workflow, and that's still a big part of what makes it special to me.
+Before updating, close CatCB and back up your saved data if it contains anything important. Always download updates from the official repository.
 
-If you find a bug, have an idea for an improvement, or simply want to share your experience, feel free to open an issue on GitHub.
+## Found a bug or have an idea?
 
-Constructive feedback is always welcome!
+CatCB is an ongoing personal project, and feedback is welcome.
 
-**[Report a bug or suggest an improvement](https://github.com/bejlintkiraly/CatCB/issues)**
+If something doesn't work as expected, or you have an idea that could make it more useful, feel free to open a GitHub issue.
 
-## 📄 Source code and usage terms
+I can't promise every suggestion will make it into the application, but useful feedback is always appreciated.
+
+**[Open an issue or suggest an improvement](https://github.com/bejlintkiraly/CatCB/issues)**
+
+## License and usage
 
 Copyright (c) 2026 bejlintkiraly. All rights reserved.
 
-This repository is publicly available so people can discover and inspect the CatCB project.
-
-No general license is granted to reuse, copy, modify, redistribute, or incorporate the source code into other projects. Such use requires prior permission from the copyright holder, unless otherwise required by applicable law or the terms governing use of the GitHub platform.
+This project is publicly available for viewing on GitHub, but no license is granted to use, copy, modify, or redistribute the source code. All rights are reserved unless explicit permission is granted by the copyright holder.
 
 You may download and use the official prebuilt releases for personal use. Permission to use the application does not grant permission to redistribute the executable or publish modified versions.
 
 No third-party rights are granted or changed by this notice.
 
-## ⚠️ Disclaimer
+## Disclaimer
 
 CatCB is provided "as is", without warranties of any kind. Use it at your own discretion and keep backups of important data.
 
-CatCB is an independent personal project and is not affiliated with, endorsed by, or officially connected to Microsoft.
+CatCB is an independent personal project. It is not affiliated with, endorsed by, or officially connected to Microsoft.
 
 ---
 
-*Made with a lot of tweaking, a little stubbornness, and a cat-inspired touch. 🐱*
+```text
+ /\_/\
+( o.o )   Thanks for stopping by!
+ > ^ <    Now go make your day a little easier.
+```
+
+Made with a lot of tweaking, a little stubbornness, and a cat-inspired touch.
