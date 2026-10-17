@@ -39,4 +39,8 @@ See [CHANGELOG.md](CHANGELOG.md) for the version summary.
 
 ## License
 
-No open-source license is included yet. Until the project owner chooses and adds a license, do not assume others have permission to redistribute or modify this code. A private GitHub repository is recommended while the project is being prepared.
+## License
+
+Copyright (c) 2026 bejlintkiraly. All rights reserved.
+
+This project is publicly available for viewing on GitHub, but no license is granted to use, copy, modify, or redistribute the source code. All rights are reserved unless explicit permission is granted by the copyright holder.
