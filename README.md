@@ -74,7 +74,7 @@ You don't need Python or any development tools just to use the prebuilt version.
   <img src="assets/ehzDdxV.jpg" alt="A little cat keeping an eye on the download" width="420">
 </p>
 
-### 🛡️ A quick note about Windows SmartScreen
+### 😸 A quick note about Windows SmartScreen
 
 Because CatCB is an independently published application, Windows SmartScreen may show a warning when you first launch it. This can happen with applications that don't have an established reputation or a trusted digital signature.
 
@@ -82,7 +82,7 @@ That warning doesn't automatically mean an application is malicious, but it shou
 
 For your own peace of mind, download CatCB only from the official GitHub Releases page. If you're unsure about the file or don't trust its source, don't run it.
 
-## 🖥️ What do you need?
+## 😸 What do you need?
 
 Not much! 🐾
 
@@ -92,7 +92,7 @@ Not much! 🐾
 
 Some features may behave differently depending on your Windows and Outlook setup.
 
-## 🔧 Curious about the source code?
+## 😸 Curious about the source code?
 
 The repository includes the files used to build CatCB, along with a Windows build script.
 
@@ -108,7 +108,7 @@ The exact requirements depend on the current build script and your environment. 
 
 If you just want to use CatCB, downloading the prebuilt release is the easier route. 🐈‍⬛
 
-## 💾 Where does CatCB keep my data?
+## 😸 Where does CatCB keep my data?
 
 Your application data is stored locally under your Windows user profile:
 
@@ -172,7 +172,7 @@ CatCB is an independent personal project. It is not affiliated with, endorsed by
 ---
 
 <p align="center">
-  <img src="assets/KYg9ryo-funny-cat-desktop-wallpaper.jpg" alt="Your friendly CatCB cat" width="250">
+  <img src="assets/a75d552ca60dc99682ba8a121513ef79.jpg" alt="Your friendly CatCB cat" width="250">
 </p>
 
 <p align="center">
