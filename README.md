@@ -1,153 +1,148 @@
-# 🐱 CatCB
+# CatCB 🐱
 
-### 🐾 A little tool that makes everyday work easier.
+### A little tool that makes everyday work easier. 🐾
 
 <p align="center">
-  <img src="assets/KYg9ryo-funny-cat-desktop-wallpaper.jpg" alt="CatCB's curious cat mascot" width="700">
+  <img src="assets/KYg9ryo-funny-cat-desktop-wallpaper.jpg" alt="A curious cat welcoming you to CatCB" width="750">
 </p>
 
-Hi, and welcome to CatCB! 🐈
+Hey, welcome to CatCB! 😸
 
-CatCB started as a small personal project. I wanted one place to keep the text snippets I use regularly, without having to search through old notes or type the same things over and over again.
+CatCB started with a pretty simple idea: I wanted a place to keep all the text snippets I use regularly, so I wouldn't have to keep searching for them or typing the same things over and over again.
 
-As I kept working on it, I added features, adjusted the interface, fixed things that annoyed me, and slowly turned it into a tool that fits the way I like to work.
+One thing led to another, I kept adding little improvements, changed the interface until it felt right, and eventually ended up with a much more useful tool than I originally planned.
 
-Now I'm sharing it here in case it can make someone else's day a little easier, too.
+So, here it is! I thought I'd share it in case somebody else finds it useful, too.
 
-And yes, there are cats. Quite a few, actually. 🐈‍⬛
+And yes, I clearly have a thing for cats. You're going to notice. 🐈
 
----
+## 🐾 So, what does CatCB actually do?
 
-## 🐾 What can CatCB do?
+CatCB is a small Windows app that helps me save time on repetitive tasks. It keeps frequently used text in one place and makes it easier to reuse whenever I need it.
 
-CatCB is a Windows productivity tool for keeping reusable text organized and making everyday tasks a little less repetitive.
+Here's what you can do with it:
 
-| Feature | What it does |
-|---|---|
-| 🐱 **Text snippets** | Save frequently used text in custom categories. |
-| 🐾 **Multiple selection** | Select and manage several snippets at once. |
-| ✂️ **Clipboard shortcuts** | Copy, cut, paste, and delete snippets efficiently. |
-| ↩️ **Undo and redo** | Recover from changes while working. |
-| 🗂️ **Custom organization** | Use categories and icons to keep things easy to find. |
-| 📝 **Report Studio** | Prepare and edit report content in one place. |
-| ✉️ **Outlook Studio** | Prepare email content and work with Outlook messages. |
-| 💾 **Local storage** | Keep your snippets and settings on your Windows profile. |
-| 🎨 **Personalization** | Adjust parts of the interface to suit your preferences. |
+- **Save text snippets** in your own categories, so you can find them without digging through old notes.
+- **Select and manage multiple snippets** instead of handling everything one item at a time.
+- **Copy, cut, paste and delete** snippets using the available shortcuts.
+- **Undo and redo changes** when you need to go back a step.
+- **Customize your organization** with categories and icons.
+- **Prepare reports** using Report Studio.
+- **Work with email content** using Outlook Studio and supported Outlook features.
+- **Save Outlook messages as `.msg` files**, including attachments where supported.
+- **Keep your data locally** in your Windows user profile.
 
-The idea isn't to replace every tool you already use. It's simply to make the repetitive parts of your day a little easier. 🐈
+The whole point is to make everyday work a little less repetitive. Nothing complicated — just a handy tool that does what I need it to do. 🐈‍⬛
 
-## 😻 A little look inside
+## 😻 A peek inside
 
-Here's where your own CatCB screenshots can shine!
+Here's what CatCB looks like in action.
 
 <p align="center">
-  <img src="assets/main-window.png" alt="CatCB main window" width="850">
+  <img src="assets/main-window.png" alt="CatCB main application window" width="850">
 </p>
 
 <p align="center">
-  <em>Keep your snippets organized. Find what you need. Get on with your day. 🐾</em>
+  <em>Your snippets, your categories, your way of working. 🐾</em>
 </p>
 
-If you add more screenshots later, you can put them in the `assets` folder and display them here.
+*More screenshots may find their way here as the project grows.*
 
-## 🐈 Download CatCB
+## 🐱 Get CatCB
 
-The easiest way to get started is to download the latest compiled Windows version.
+Want to give it a try?
+
+The easiest option is to download the latest compiled Windows version from GitHub.
 
 <p align="center">
   <a href="https://github.com/bejlintkiraly/CatCB/releases/latest">
-    <strong>🐾 Download the latest CatCB release</strong>
+    <strong>🐾 Download CatCB — latest release</strong>
   </a>
 </p>
 
-1. Open the [Releases page](https://github.com/bejlintkiraly/CatCB/releases).
-2. Download `CatCB.exe` from the latest release.
-3. Save it somewhere convenient on your Windows PC.
-4. Run the application.
+1. Open the [latest Releases page](https://github.com/bejlintkiraly/CatCB/releases/latest).
+2. Download `CatCB.exe`.
+3. Save it somewhere convenient on your PC.
+4. Run it and have a look around. 😸
 
-You don't need to install Python or build anything from source to use the prebuilt release. 😸
+You don't need Python or any development tools just to use the prebuilt version.
 
 <p align="center">
-  <img src="assets/ehzDdxV.jpg" alt="A little CatCB download companion" width="400">
+  <img src="assets/ehzDdxV.jpg" alt="A little cat keeping an eye on the download" width="420">
 </p>
 
-### 🛡️ Windows SmartScreen notice
+### 🛡️ A quick note about Windows SmartScreen
 
-Windows may display a SmartScreen warning when you launch CatCB. This can happen with independently published applications that don't yet have an established reputation or a trusted digital signature.
+Because CatCB is an independently published application, Windows SmartScreen may show a warning when you first launch it. This can happen with applications that don't have an established reputation or a trusted digital signature.
 
-The warning alone doesn't mean the application is malicious, but it also shouldn't be treated as proof that a file is safe.
+That warning doesn't automatically mean an application is malicious, but it shouldn't be ignored either.
 
-For your own peace of mind, download CatCB only from the official GitHub Releases page. If you're unsure about a file or don't trust its source, don't run it.
+For your own peace of mind, download CatCB only from the official GitHub Releases page. If you're unsure about the file or don't trust its source, don't run it.
 
-## 🖥️ What do I need?
+## 🖥️ What do you need?
 
-- 🐈 A Windows PC.
-- 🐾 The downloaded CatCB executable.
-- ✉️ Microsoft Outlook Classic, installed and configured, for features that rely on its desktop integration.
+Not much!
 
-The availability of some features may depend on your local Windows and Outlook setup.
+- A Windows PC.
+- The downloaded CatCB executable.
+- Microsoft Outlook Classic installed and configured if you want to use features that depend on its desktop integration.
 
-## 🔧 Want to build it yourself?
+Some features may behave differently depending on your Windows and Outlook setup.
 
-The source code is available in this repository for people who want to inspect how the project is put together.
+## 🔧 Curious about the source code?
 
-The project includes a Windows build script named `BUILD_TEST_EXE.bat`.
+The repository includes the files used to build CatCB, along with a Windows build script.
+
+If you'd like to build it yourself:
 
 1. Install Python and make sure the required components are available.
 2. Download the source code from this repository.
-3. Extract the files into a folder.
-4. Open that folder and run `BUILD_TEST_EXE.bat`.
-5. If the build completes successfully, look for `CatCB.exe` inside the `dist` folder.
+3. Extract it into a folder.
+4. Run `BUILD_TEST_EXE.bat`.
+5. If the build finishes successfully, look for `CatCB.exe` in the `dist` folder.
 
-The exact requirements depend on the current build script and your local environment. If something doesn't work, check the error output first.
+The exact requirements depend on the current build script and your environment. If something goes wrong, check the error output first.
 
-For everyday use, downloading the prebuilt release is the simpler option. 🐾
+If you just want to use CatCB, downloading the prebuilt release is the easier route. 🐈
 
-## 💾 Where is my data stored?
+## 💾 Where does CatCB keep my data?
 
-CatCB stores its application data locally under your Windows user profile:
+Your application data is stored locally under your Windows user profile:
 
 ```text
 %APPDATA%\CatCB\state.json
 ```
 
-Keeping the data separate from the executable means that replacing CatCB with a newer version normally doesn't require you to start from scratch.
+Keeping the data separate from the executable means that replacing CatCB with a newer version normally won't require you to start from scratch.
 
-Still, it's a good idea to keep a backup of this file before trying a new build or making major changes.
+Still, please make a backup before trying a new build or making major changes. It's better to be safe than sorry — and cats are notoriously bad at recovering lost files. 🐱
 
-One small reminder: if you store sensitive information in your snippets, check your saved data before sharing it with anyone.
-
-Your snippets are yours. Even the ones with suspiciously many cat references. 😹
-
-<p align="center">
-  <img src="assets/Fva28N5.jpg" alt="A relaxed little cat" width="350">
-</p>
+One more thing: if you've saved personal or sensitive information in your snippets, check your data before sharing the file with anyone.
 
 ## 🔄 Updates
 
-New versions and their changes are published on the GitHub Releases page.
+When a new version is available, you'll find it on the Releases page:
 
-- 🐾 [Latest release](https://github.com/bejlintkiraly/CatCB/releases/latest)
-- 🐈 [All releases and changelogs](https://github.com/bejlintkiraly/CatCB/releases)
+**[🐾 Browse CatCB releases](https://github.com/bejlintkiraly/CatCB/releases)**
 
-Before updating, close CatCB and back up your saved data if it contains anything important. Always download updates from the official repository.
+Before updating, close CatCB and back up your data if it contains anything important. Always download releases from the official repository.
 
-## 💬 Found a bug or have an idea?
+## 💬 Found a bug? Have an idea?
 
-CatCB is an ongoing personal project, and feedback is welcome. 🐱
+I'd love to hear how CatCB works for you.
 
-If something doesn't work as expected, or you have an idea that could make it more useful, feel free to open a GitHub issue.
+If you spot a bug, run into something confusing, or have an idea for a feature, feel free to open an issue on GitHub.
 
-I can't promise every suggestion will make it into the application, but useful feedback is always appreciated.
+I can't promise every suggestion will make it into the app, but thoughtful feedback is always welcome. After all, there's always room to make a good little tool even better. 🐾
 
 <p align="center">
   <a href="https://github.com/bejlintkiraly/CatCB/issues">
-    <strong>🐾 Report a bug or suggest an improvement</strong>
+    <strong>🐈 Open an issue or suggest an improvement</strong>
   </a>
 </p>
 
 <p align="center">
-  <img src="assets/m9v64v6.jpg" alt="One last cat saying hello" width="450">
+  <img src="assets/Fva28N5.jpg" alt="A fluffy cat taking a little break" width="380">
 </p>
 
 ## 📜 License and usage
@@ -160,16 +155,18 @@ You may download and use the official prebuilt releases for personal use. Permis
 
 No third-party rights are granted or changed by this notice.
 
-## ⚠️ Disclaimer
+## ⚠️ A small disclaimer
 
 CatCB is provided "as is", without warranties of any kind. Use it at your own discretion and keep backups of important data.
 
 CatCB is an independent personal project. It is not affiliated with, endorsed by, or officially connected to Microsoft.
 
----
+<p align="center">
+  <img src="assets/m9v64v6.jpg" alt="One last little cat saying goodbye" width="460">
+</p>
 
 <p align="center">
-  🐈‍⬛ <strong>Made with a lot of tweaking, a little stubbornness, and a cat-inspired touch.</strong> 🐈
+  <strong>Thanks for stopping by! 🐱</strong>
   <br>
-  <em>Thanks for stopping by. Hope CatCB makes your day a little easier! 🐾</em>
+  Made with a lot of tweaking, a little stubbornness, and an unreasonable number of cat pictures. 🐈‍⬛
 </p>
