@@ -76,7 +76,7 @@ def main() -> int:
         print(f"Warning: couldn't create build log: {exc}", flush=True)
 
     write_log("")
-    write_log("  CatCB v1.10.2 — EXE BUILDER")
+    write_log("  CatCB v1.10.3 — EXE BUILDER")
     write_log("  No administrator rights are requested by this builder.")
     write_log("")
 
@@ -168,6 +168,8 @@ def main() -> int:
             for chunk in iter(lambda: exe_file.read(1024 * 1024), b""):
                 exe_hash.update(chunk)
         release_notes = ("CatCB v" + release_version
+            + "\n- Fixed startup defaults: starter snippets appear on first launch only and stay deleted after the user removes them"
+            + "\n- Saved empty snippet lists are now treated as intentional; storage connection errors no longer invent starter snippets"
             + "\n- Native CatCB window with its own taskbar icon (pywebview + WebView2), not a Chrome app window"
             + "\n- Maximized normal window with title bar and Windows taskbar visible"
             + "\n- Fixed responsive/high-DPI multi-select list layout and its four-column grid"

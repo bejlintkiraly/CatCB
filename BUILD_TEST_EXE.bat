@@ -1,10 +1,10 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-title CatCB v1.10.2 Builder
+title CatCB v1.10.3 Builder
 
 echo.
-echo  CatCB v1.10.2 - EXE Builder
+echo  CatCB v1.10.3 - EXE Builder
 echo  Starting diagnostic build helper...
 echo.
 

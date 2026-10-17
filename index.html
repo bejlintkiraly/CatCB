@@ -356,7 +356,7 @@ label{user-select:none}
 <div class="app">
  <header class="topbar">
   <div class="brand"><img src="/CatCB_Mascot_v14.png" alt="CatCB mascot"><div>
-   <div class="brand-title"><h1>CatCB</h1><span class="version" data-app-version>v1.10.2</span></div><div class="sub">Your personal IT snippet manager</div></div>
+   <div class="brand-title"><h1>CatCB</h1><span class="version" data-app-version>v1.10.3</span></div><div class="sub">Your personal IT snippet manager</div></div>
   </div>
   <div class="searchwrap"><span class="searchicon">⌕</span><input id="search" placeholder="Search snippets…  (Ctrl + F)" autocomplete="off"></div>
   <div class="top-actions">
@@ -442,7 +442,7 @@ const legacy={
  "Custom template example":"Incident {{INC}} has been reviewed by {{TEAM}}. Current system: {{HOSTNAME}}.",
  "Team notification":"Dear team, please be informed that incident {{INC}} is currently under investigation. Further updates will follow."
 };
-const UI_APP_VERSION="1.10.2";
+const UI_APP_VERSION="1.10.3";
 let verifiedUpdate=null;
 let updateSelectedFile=null;
 let state={snippets:[],deleted:[],categories:[],categoryIcons:{},theme:"dark",wallpaper:true,wallpaperOpacity:50,alwaysTop:false,filter:"all",category:"All categories",selectedId:null,migration:{}};
@@ -501,14 +501,20 @@ async function init(){
   state.categories=Array.isArray(saved.categories)?saved.categories:[];
   state.categoryIcons=(saved.categoryIcons&&typeof saved.categoryIcons==="object")?saved.categoryIcons:{};
   state.migration=saved.migration||{};
-  if(Array.isArray(saved.snippets)&&saved.snippets.length){
+  if(Array.isArray(saved.snippets)){
+   // An empty saved list is intentional (the user may have deleted every snippet).
+   // Only a state file that has never been initialized gets the starter examples.
    state.snippets=saved.snippets.map(s=>({...s,id:s.id||uid(),category:s.category||"Other",favorite:!!s.favorite,icon:s.icon||"☏"}));
    migrateLegacyDefaults();
-  }else if(Array.isArray(saved.snippets)){
+  }else if(saved.initialized===true){
+   state.snippets=[];
+  }else{
+   // First launch only: state has not been initialized yet.
    state.snippets=defaults.map(x=>({...x,id:uid()}));
-  }else{state.snippets=defaults.map(x=>({...x,id:uid()}));}
+  }
  }catch(e){
-  state.snippets=defaults.map(x=>({...x,id:uid()}));
+  // Don't invent starter snippets if local storage could not be read.
+  state.snippets=[];
   toast("Could not connect to local storage. Run the CatCB launcher and keep its window open.");
  }
  const firstVisible=activeSnippets()[0];
@@ -536,7 +542,7 @@ function migrateLegacyDefaults(){
 function persist(){
  clearTimeout(saveTimer);saveTimer=setTimeout(async()=>{
   try{await api("/api/state",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-   snippets:state.snippets,deleted:state.deleted,categories:allCategories(),categoryIcons:state.categoryIcons,theme:"dark",
+   initialized:true,snippets:state.snippets,deleted:state.deleted,categories:allCategories(),categoryIcons:state.categoryIcons,theme:"dark",
    wallpaper:state.wallpaper,wallpaperOpacity:state.wallpaperOpacity,alwaysTop:state.alwaysTop,migration:state.migration
   })})}catch(e){setStatus("LOCAL SAVE RETRY");}
  },100);
@@ -1459,7 +1465,7 @@ function openSettings(tab="general"){
   <div class="update-hero"><div class="update-hero-icon">↻</div><div style="flex:1"><h3>CatCB Update Center</h3><p>Select a CatCB update package ZIP. CatCB checks its app identity, version and SHA-256 hash before offering to replace the running EXE. Your snippets and preferences stay in the separate JSON config file.</p></div></div>
   <div class="update-card">
    <h3>01 · CURRENT INSTALLATION</h3>
-   <div class="update-version-row"><div><div style="font-size:11px;color:var(--muted);margin-bottom:5px">Installed version</div><strong id="updateCurrentVersion">v1.10.2</strong></div><span class="pill" id="updateInstallMode">Checking install type…</span></div>
+   <div class="update-version-row"><div><div style="font-size:11px;color:var(--muted);margin-bottom:5px">Installed version</div><strong id="updateCurrentVersion">v1.10.3</strong></div><span class="pill" id="updateInstallMode">Checking install type…</span></div>
    <div class="update-version-row"><div style="min-width:0;flex:1"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Application file</div><code id="updateCurrentPath" class="config-path">Checking path…</code></div><button id="updateCopyCurrentPath" class="tiny">Copy path</button></div>
   </div>
   <div class="update-card">
@@ -1482,7 +1488,7 @@ function openSettings(tab="general"){
  <section class="settings-section ${tab==="about"?"active":""}" data-section="about">
   <div class="about-hero">
    <img src="/CatCB_Mascot_v14.png" alt="CatCB mascot">
-   <div style="flex:1;min-width:0"><div class="about-kicker">PERSONAL IT PRODUCTIVITY TOOL</div><h3>CatCB™ <span class="pill" data-about-version>Version 1.10.2</span></h3><p>Made by Bejlint 💚 · Your tiny IT sidekick 🐱</p></div>
+   <div style="flex:1;min-width:0"><div class="about-kicker">PERSONAL IT PRODUCTIVITY TOOL</div><h3>CatCB™ <span class="pill" data-about-version>Version 1.10.3</span></h3><p>Made by Bejlint 💚 · Your tiny IT sidekick 🐱</p></div>
   </div>
   <div class="about-grid">
    <div class="about-card">
@@ -1503,9 +1509,10 @@ function openSettings(tab="general"){
    </div>
   </div>
   <div class="about-history">
-   <div class="about-history-head"><h3>↻ Update history</h3><span class="pill" data-latest-version>Latest: v1.10.2</span></div>
+   <div class="about-history-head"><h3>↻ Update history</h3><span class="pill" data-latest-version>Latest: v1.10.3</span></div>
    <div class="about-history-list">
-    <div class="history-entry"><div class="history-version">v1.10.2 · Current</div><div><h4>Native CatCB window &amp; update fix</h4><p>Runs in its own CatCB-branded window instead of a Chrome app window, improves high-DPI layout, clears multi-selection when clicking outside the snippet list, removes the outdated “NEW” badge, and replaces the CMD/findstr updater with a hidden VBScript updater that has bounded waiting and logging.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.10.3 · Current</div><div><h4>Keep deleted starter snippets deleted</h4><p>Starter examples are now added only on first launch. If you delete every snippet, the empty list is saved and stays empty after restarting. A local-storage connection failure no longer creates temporary starter examples.</p></div></div>
+    <div class="history-entry"><div class="history-version">v1.10.2</div><div><h4>Native CatCB window &amp; update fix</h4><p>Runs in its own CatCB-branded window instead of a Chrome app window, improves high-DPI layout, clears multi-selection when clicking outside the snippet list, removes the outdated “NEW” badge, and replaces the CMD/findstr updater with a hidden VBScript updater that has bounded waiting and logging.</p></div></div>
     <div class="history-entry"><div class="history-version">v1.10.1</div><div><h4>Multi-select layout &amp; update reliability</h4><p>Introduced multi-select layout repairs and the first bounded update helper. This release improves the layout for narrow/high-DPI windows and replaces the visible CMD-based updater.</p></div></div>
     <div class="history-entry"><div class="history-version">v1.10.0</div><div><h4>Multi-select & clipboard actions</h4><p>Select multiple snippets with checkboxes, Ctrl-click or Shift-click. Copy, cut, paste, duplicate and move batches between categories; Delete moves all selected snippets to Recycle Bin. The Update Center stays compatible with generated update ZIP packages.</p></div></div>
     <div class="history-entry"><div class="history-version">v1.9.0</div><div><h4>Update Center & version consistency</h4><p>Added a local update-file installer with package validation, SHA-256 checking, backup and restart flow. Unified version labels and automatic update-package generation.</p></div></div>
@@ -1585,7 +1592,7 @@ async function deleteCategory(name){
  persist();renderNav();renderList();if(settingsWasOpen)openSettings("categories");toast("Category removed");
 }
 function exportBackup(){
- const data={version:"1.10.2",snippets:state.snippets,deleted:state.deleted,categories:allCategories(),categoryIcons:state.categoryIcons,theme:"dark",wallpaper:state.wallpaper,wallpaperOpacity:state.wallpaperOpacity};
+ const data={version:"1.10.3",snippets:state.snippets,deleted:state.deleted,categories:allCategories(),categoryIcons:state.categoryIcons,theme:"dark",wallpaper:state.wallpaper,wallpaperOpacity:state.wallpaperOpacity};
  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CatCB_backup.json";a.click();URL.revokeObjectURL(a.href);toast("Backup exported");
 }

@@ -18,7 +18,7 @@ import webbrowser
 import traceback
 
 APP_NAME = "CatCB"
-APP_VERSION = "1.10.2"
+APP_VERSION = "1.10.3"
 RESOURCE_DIR = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
 DATA_DIR = Path(os.environ.get("APPDATA", Path.home())) / APP_NAME
 STATE_FILE = DATA_DIR / "state.json"
